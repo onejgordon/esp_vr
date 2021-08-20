@@ -1,0 +1,16 @@
+{
+  "source": "Unity",
+  "applications": [
+    {
+      "app_key": "application.generated.unity.esp.exe",
+      "launch_type": "url",
+      "url": "steam://launch/",
+      "action_manifest_path": "C:\\Users\\biose\\Documents\\GitHub\\esp_vr\\actions.json",
+      "strings": {
+        "en_us": {
+          "name": "esp [Testing]"
+        }
+      }
+    }
+  ]
+}
