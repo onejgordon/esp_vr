@@ -17,7 +17,6 @@ public class ExperimentRunner : MonoBehaviour
     private const float MAP_MULT = 0.01f;
 
     public SessionSaver session;
-    public bool VISUAL_ADVERSARY_INFO = true;
     public bool QUICK_DEBUG = true;
     public int TRIAL_SECS = 120;
     public int N_TRIALS = 10; // Set to 0 for production. Just for short debug data collection
@@ -36,13 +35,9 @@ public class ExperimentRunner : MonoBehaviour
     // Session specs
     private string session_id;
     private List<int> map_order = new List<int>();
-    private List<MapSpec> maps = new List<MapSpec>();
+    private List<MapDef> maps = new List<MapDef>();
 
     // Main experiment objects
-    public GameObject room;
-    public GameObject wall;
-    public Transform node;
-    private List<Transform> nodes = new List<Transform>();
 
     // Main experiment behaviors
     private MapBehavior mapBehavior;
@@ -57,7 +52,7 @@ public class ExperimentRunner : MonoBehaviour
     {
         this.goalMat =  Resources.Load("GoalMat", typeof(Material)) as Material;
         if (QUICK_DEBUG) {
-            practice_rounds = 1;
+            practice_rounds = 0;
             N_TRIALS = 5;
             this.session_id = "DEBUG";
         } else {
@@ -68,10 +63,10 @@ public class ExperimentRunner : MonoBehaviour
         this.practice_remaining = this.practice_rounds;
         this.ui = GameObject.Find("UICanvas").GetComponent<UIBehavior>();
         this.hmdCamera = GameObject.Find("Camera").GetComponent<Transform>();
-        this.controller = GameObject.FindGameObjectWithTag("Controller").GetComponent<Transform>();
+        // this.controller = GameObject.FindGameObjectWithTag("Controller").GetComponent<Transform>();
 
         this.mapBehavior = GameObject.Find("Map").GetComponent<MapBehavior>();
-        this.maps = new List<MapSpec>();
+        this.maps = new List<MapDef>();
         // TobiiXR_Settings tobii_settings = new TobiiXR_Settings();
         // tobii_settings.FieldOfUse = FieldOfUse.Analytical;
         // TobiiXR.Start(tobii_settings);
@@ -83,7 +78,7 @@ public class ExperimentRunner : MonoBehaviour
     {
         if (recording && this.current_trial != null) {
             Quaternion hmdRot = hmdCamera.rotation;
-            Quaternion ctrlRot = controller.rotation;
+            // Quaternion ctrlRot = controller.rotation;
             Vector3 gazeOrigin = new Vector3();
             Vector3 gazeDirection = new Vector3();
             float convDistance = -1.0f; // Default when not valid
@@ -113,6 +108,7 @@ public class ExperimentRunner : MonoBehaviour
     void RandomizeTrialOrder() {
         // TODO
         this.map_order = Enumerable.Range(1, N_TRIALS).ToList();
+        Debug.Log(map_order.ToString());
     }
 
     public void BeginExperiment() {
@@ -148,8 +144,6 @@ public class ExperimentRunner : MonoBehaviour
             }
         }
         this.current_trial = new SessionTrial(this.session_id, this.trial_index, this.mapBehavior.map, this.practicing);
-        this.mapBehavior.maybeClearMap();
-        this.mapBehavior.initialize();
         if (this.practicing) {
             ui.ShowHUDScreenWithConfirm(
                 string.Format(
