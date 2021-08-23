@@ -68,22 +68,45 @@ public class MapBehavior : MonoBehaviour
         this.tiles = new List<GameObject>();   
         for (int i=0; i<this.map.wall_ids.Count; i++) {
             Wall wall = this.baseMapDef.getWall(this.map.wall_ids[i]);
-            // Transform trWall = this.addWall(wall.id.ToString(), wall.x, wall.y, 0);
-            // trWall.name = "Wall" + wall.id;
+            Transform trWall = this.addWall(wall);
         }
         for (int j=0; j<this.map.tile_types.Count; j++) {
             Tile tile = this.baseMapDef.getTile(j.ToString());
             int tile_type = this.map.tile_types[j];
             Transform trTile = this.addTile(tile, tile_type);
-            trTile.name = "Tile" + tile.id;
         }
     }
 
-    private Transform addWall(string id, float x, float y, float z) {
-        GameObject goNewWall = Instantiate(this.prWall, new Vector3(x * Constants.MAP_MULT, y * Constants.MAP_MULT, z), Quaternion.Euler(0, 90, 90));
+    public void setupCameraForPlanning(Transform trCamera) {
+        trCamera.SetPositionAndRotation(new Vector3(this.baseMapDef.center[0], Constants.CAM_PLANNING_HEIGHT, this.baseMapDef.center[1]),
+            Quaternion.Euler(90, 0, 0) // Look down
+        );
+    }
+
+    public void setupCameraForNavigation(Transform trCamera) {
+        trCamera.SetPositionAndRotation(new Vector3(this.baseMapDef.start[0], Constants.CAM_NAV_HEIGHT, this.baseMapDef.start[1]),
+            Quaternion.Euler(90, 0, 0)
+        );
+    }
+
+    public void setupAgentForNavigation(Transform trAgent) {
+        trAgent.position = new Vector3(this.baseMapDef.start[0], 2.0f, this.baseMapDef.start[1] + trAgent.localScale.z);
+    }
+
+    private Transform addWall(Wall wall) {
+        GameObject goNewWall = Instantiate(this.prWall);
         Transform trNewWall = goNewWall.transform;
+        trNewWall.name = "Wall" + wall.id;
         WallBehavior wb = trNewWall.GetComponent<WallBehavior>();
-        wb.setID(id);
+        wb.setup(wall);
+        string[] pids = new string[]{wall.pid1, wall.pid2};
+        float wallDepth = 1.0f;
+        Vector2 p1 = this.baseMapDef.getPoint(wall.pid1).toVector();
+        Vector2 p2 = this.baseMapDef.getPoint(wall.pid2).toVector();        
+        float theta = Vector2.Angle(p1, p2) + 90;
+        Vector2 vecDepth = new Vector2(wallDepth*Mathf.Cos(theta), wallDepth*Mathf.Sin(theta));
+        List<Vector2> points = new List<Vector2>(){p1 + vecDepth/2, p1 - vecDepth/2, p2 - vecDepth/2, p2 + vecDepth/2};
+        wb.makeMesh(points.ToArray());
         trNewWall.SetParent(gameObject.transform);
         this.walls.Add(goNewWall);
         return trNewWall;
@@ -102,6 +125,7 @@ public class MapBehavior : MonoBehaviour
         }
         tb.makeMesh(points.ToArray());
         trNewTile.SetParent(gameObject.transform);
+        trNewTile.name = "Tile" + tile.id;
         this.tiles.Add(goNewTile);
         return trNewTile;
     }

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3076895990533114454}
   - component: {fileID: 3076895990533114453}
   - component: {fileID: 1385253690425774899}
+  - component: {fileID: 9177410579745084054}
   m_Layer: 0
   m_Name: Tile
   m_TagString: Untagged
@@ -95,5 +96,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   matWater: {fileID: 2100000, guid: a95d20a8878848748bf3a19b2ece639b, type: 2}
-  matDWater: {fileID: 2100000, guid: 291810bc17c99443584457bfa0d90061, type: 2}
+  matDWater: {fileID: 2100000, guid: 75afc3cf8f4274b9e866dcab422c7b4e, type: 2}
   matLand: {fileID: 2100000, guid: 57d63d68edac343ac88a0403365f9e8f, type: 2}
+  height: 0.1
+--- !u!54 &9177410579745084054
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3076895990533114452}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0

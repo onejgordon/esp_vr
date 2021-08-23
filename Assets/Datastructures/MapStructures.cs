@@ -68,6 +68,9 @@ public class BaseMapDef {
     public List<Point> points;
     public List<Tile> tiles;
 
+    public List<float> center;  // x,y
+    public List<float> start;  // x,y
+
     public Dictionary<string, Point> pointLookup;
     public Dictionary<string, Wall> wallLookup;
     public Dictionary<string, Tile> tileLookup;
@@ -76,6 +79,8 @@ public class BaseMapDef {
         this.walls = new List<Wall>();
         this.tiles = new List<Tile>();
         this.points = new List<Point>();
+        this.center = new List<float>();
+        this.start = new List<float>();
         this.wallLookup = new Dictionary<string, Wall>();
         this.pointLookup = new Dictionary<string, Point>();
         this.tileLookup = new Dictionary<string, Tile>();

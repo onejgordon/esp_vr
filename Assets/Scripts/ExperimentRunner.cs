@@ -31,6 +31,7 @@ public class ExperimentRunner : MonoBehaviour
     private SessionTrial current_trial;
     private bool recording = false;
     private bool practicing = false;
+    private string mode = "planning";
 
     // Session specs
     private string session_id;
@@ -39,14 +40,17 @@ public class ExperimentRunner : MonoBehaviour
 
     // Main experiment objects
 
+    private Transform trCamera;
+    public Transform trAgent;
+    private Transform controller;
+
+
     // Main experiment behaviors
     private MapBehavior mapBehavior;
 
     // Other scene objects
     public UIBehavior ui;
     // public SteamVR_LaserPointer laserPointer;
-    private Transform hmdCamera;
-    private Transform controller;
 
     void Start()
     {
@@ -62,7 +66,7 @@ public class ExperimentRunner : MonoBehaviour
         this.session.data.left_handed = this.left_handed;
         this.practice_remaining = this.practice_rounds;
         this.ui = GameObject.Find("UICanvas").GetComponent<UIBehavior>();
-        this.hmdCamera = GameObject.Find("Camera").GetComponent<Transform>();
+        this.trCamera = GameObject.Find("Camera").GetComponent<Transform>();
         // this.controller = GameObject.FindGameObjectWithTag("Controller").GetComponent<Transform>();
 
         this.mapBehavior = GameObject.Find("Map").GetComponent<MapBehavior>();
@@ -77,7 +81,7 @@ public class ExperimentRunner : MonoBehaviour
     void Update()
     {
         if (recording && this.current_trial != null) {
-            Quaternion hmdRot = hmdCamera.rotation;
+            Quaternion hmdRot = trCamera.rotation;
             // Quaternion ctrlRot = controller.rotation;
             Vector3 gazeOrigin = new Vector3();
             Vector3 gazeDirection = new Vector3();
@@ -158,10 +162,34 @@ public class ExperimentRunner : MonoBehaviour
                 ui.ShowHUDScreenWithConfirm("Great job. Practice rounds finished. All remaining trials are real and will be scored. Click your controller trigger to proceed.",
                 DBLUE, "BeginTrial");
             } else {
-                // Immediately start decision stage / timer
                 BeginTrial();
             }
         }
+    }
+
+
+    void BeginTrial() {
+        this.StartPlanningPhase();
+    }
+
+
+    void StartPlanningPhase() {
+        this.mode = "planning";
+        this.mapBehavior.setupCameraForPlanning(this.trCamera);
+        // Set timeout to start navigation
+        StartCoroutine(WaitThenNavigate(5.0f));
+    }
+
+    IEnumerator WaitThenNavigate(float waitTime) {
+        yield return new WaitForSeconds(waitTime);
+        StartNavigationPhase();
+    }
+
+    void StartNavigationPhase() {
+        this.mode = "navigation";
+        this.trAgent.gameObject.SetActive(true);
+        this.mapBehavior.setupCameraForNavigation(this.trCamera);
+        this.mapBehavior.setupAgentForNavigation(this.trAgent);
     }
 
     public void FinishTrial() {
@@ -183,10 +211,6 @@ public class ExperimentRunner : MonoBehaviour
 
     public SessionTrial getCurrentTrial() {
         return this.current_trial;
-    }
-
-    void BeginTrial() {
-
     }
 
     public void SaveToPath(string node_id) {
@@ -219,4 +243,7 @@ public class ExperimentRunner : MonoBehaviour
         // TobiiXR.Stop();
     }
 
+    public bool navigationMode() {
+        return this.mode == "navigation";
+    }
 }

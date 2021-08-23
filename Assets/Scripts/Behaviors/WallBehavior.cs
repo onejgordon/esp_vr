@@ -5,8 +5,7 @@ using UnityEngine;
 public class WallBehavior : MonoBehaviour
 {
     private string id;
-    private bool is_goal;
-    private int position;
+    public float height;
 
 
     void Start()
@@ -24,17 +23,26 @@ public class WallBehavior : MonoBehaviour
         return this.id;
     }
 
-    public void setID(string id) {
-        this.id = id;
+    public void setup(Wall wall) {
+        this.id = wall.id;
     }
 
-    public void setIsGoal(bool is_goal) {
-        this.is_goal = is_goal;
-    }
+    public void makeMesh(Vector2[] points) {
+        bool is3D = true;
 
-    public void setPosition(int pos) {
-        // L: 0, R: 1
-        this.position = pos;
+        gameObject.transform.parent = this.transform;
+
+        // add PolyExtruder script to newly created GameObject,
+        // keep track of its reference
+        PolyExtruder polyExtruder = gameObject.AddComponent<PolyExtruder>();
+
+        // configure display of outline (before running the poly extruder)
+        // polyExtruder.isOutlineRendered = true;    // default: false
+        // polyExtruder.outlineWidth = 0.1f;         // default: 0.01f
+        // polyExtruder.outlineColor = Color.blue;   // default: Color.black
+
+        // run poly extruder according to input data
+        polyExtruder.createPrism(gameObject.name, this.height, points, Color.black, is3D);        
     }
 
 }

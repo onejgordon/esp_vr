@@ -7,9 +7,7 @@ public class TileBehavior : MonoBehaviour
     private string id;
     private bool is_goal;
     private int type;
-    public Material matWater;
-    public Material matDWater;
-    public Material matLand;
+    public float height;
 
 
     void Start()
@@ -30,22 +28,20 @@ public class TileBehavior : MonoBehaviour
     public void setup(Tile tile, int tile_type) {
         this.id = tile.id;
         this.type = tile_type;
-        gameObject.GetComponent<Renderer>().material = this.tileMaterial();
     }
 
-    public Material tileMaterial() {
-        if (this.type == 0) return this.matWater;
-        if (this.type == 1) return this.matDWater;
-        if (this.type == 2) return this.matLand;
-        return this.matLand;
+    public Color tileColor() {
+        Color color = Color.grey;
+        if (this.type == Constants.WATER) color = Color.blue;
+        if (this.type == Constants.DEEP_WATER) color = new Color(0, 0, 0.7f);
+        if (this.type == Constants.LAND) color = Color.grey;
+        return color;
     }
 
     public void makeMesh(Vector2[] points) {
-        float extrusionHeight = .1f;
         bool is3D = true;
 
         gameObject.transform.parent = this.transform;
-        gameObject.name = "Tile";
 
         // add PolyExtruder script to newly created GameObject,
         // keep track of its reference
@@ -56,8 +52,7 @@ public class TileBehavior : MonoBehaviour
         // polyExtruder.outlineWidth = 0.1f;         // default: 0.01f
         // polyExtruder.outlineColor = Color.blue;   // default: Color.black
 
-        // run poly extruder according to input data
-        polyExtruder.createPrism(gameObject.name, extrusionHeight, points, Color.grey, is3D);        
+        polyExtruder.createPrism(gameObject.name, this.height, points, this.tileColor(), is3D);        
     }
 
 }
