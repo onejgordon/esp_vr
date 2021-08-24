@@ -6,7 +6,7 @@ public class TileBehavior : MonoBehaviour
 {
     private string id;
     private bool is_goal;
-    private int type;
+    private int tile_type;
     public float height;
 
 
@@ -27,20 +27,28 @@ public class TileBehavior : MonoBehaviour
 
     public void setup(Tile tile, int tile_type) {
         this.id = tile.id;
-        this.type = tile_type;
+        this.tile_type = tile_type;
     }
 
     public Color tileColor() {
         Color color = Color.grey;
-        if (this.type == Constants.WATER) color = Color.blue;
-        if (this.type == Constants.DEEP_WATER) color = new Color(0, 0, 0.7f);
-        if (this.type == Constants.LAND) color = Color.grey;
+        if (this.tile_type == Constants.WATER) color = Color.blue;
+        if (this.tile_type == Constants.DEEP_WATER) color = new Color(0, 0, 0.7f);
+        if (this.tile_type == Constants.LAND) color = Color.grey;
         return color;
+    }
+
+    public float tileVelocityMult() {
+        float vel = 1.0f;
+        if (this.tile_type == Constants.WATER) vel = 1.0f;
+        if (this.tile_type == Constants.DEEP_WATER) vel = 0.5f;
+        return vel;
     }
 
     public void makeMesh(Vector2[] points) {
         bool is3D = true;
-
+        float true_height = this.height;
+        if (this.tile_type == Constants.LAND) true_height *= 2.0f; // Raised land
         gameObject.transform.parent = this.transform;
 
         // add PolyExtruder script to newly created GameObject,
@@ -52,7 +60,7 @@ public class TileBehavior : MonoBehaviour
         // polyExtruder.outlineWidth = 0.1f;         // default: 0.01f
         // polyExtruder.outlineColor = Color.blue;   // default: Color.black
 
-        polyExtruder.createPrism(gameObject.name, this.height, points, this.tileColor(), is3D);        
+        polyExtruder.createPrism(gameObject.name, true_height, points, this.tileColor(), is3D);        
     }
 
 }

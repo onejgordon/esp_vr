@@ -6,13 +6,15 @@ using UnityEngine.InputSystem;
 public class AgentBehavior : MonoBehaviour
 {
     private string id;
-    public float velocity = 0.01f;
+    public float baseVelocity = 0.01f;
+    private float velocity;
     public float rotationSpeed = 1.0f;
+    public ExperimentRunner experimentRunner;
 
 
     void Start()
     {
-
+        this.velocity = this.baseVelocity;
     }
 
     // Update is called once per frame
@@ -24,6 +26,19 @@ public class AgentBehavior : MonoBehaviour
             this.turn(-1);
         } else if (Keyboard.current.rightArrowKey.isPressed) {
             this.turn(1);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("Collided with " + other.gameObject.name);
+        if (other.gameObject.CompareTag("obstacle")) {
+            experimentRunner.EndTrial();
+        } else if (other.gameObject.CompareTag("tile")) {
+            TileBehavior tb = other.gameObject.GetComponent<TileBehavior>();
+            float velocity_mult = tb.tileVelocityMult();
+            this.velocity = this.baseVelocity * velocity_mult;
+            Debug.Log("Moved into tile, new velocity " + velocity_mult.ToString());
         }
     }
 

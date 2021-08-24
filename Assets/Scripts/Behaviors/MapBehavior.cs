@@ -97,16 +97,12 @@ public class MapBehavior : MonoBehaviour
         GameObject goNewWall = Instantiate(this.prWall);
         Transform trNewWall = goNewWall.transform;
         trNewWall.name = "Wall" + wall.id;
-        WallBehavior wb = trNewWall.GetComponent<WallBehavior>();
+        WallBehavior wb = trNewWall.GetComponentInChildren<WallBehavior>();
         wb.setup(wall);
         string[] pids = new string[]{wall.pid1, wall.pid2};
-        float wallDepth = 1.0f;
         Vector2 p1 = this.baseMapDef.getPoint(wall.pid1).toVector();
         Vector2 p2 = this.baseMapDef.getPoint(wall.pid2).toVector();        
-        float theta = Vector2.Angle(p1, p2) + 90;
-        Vector2 vecDepth = new Vector2(wallDepth*Mathf.Cos(theta), wallDepth*Mathf.Sin(theta));
-        List<Vector2> points = new List<Vector2>(){p1 + vecDepth/2, p1 - vecDepth/2, p2 - vecDepth/2, p2 + vecDepth/2};
-        wb.makeMesh(points.ToArray());
+        wb.positionAndOrient(p1, p2);
         trNewWall.SetParent(gameObject.transform);
         this.walls.Add(goNewWall);
         return trNewWall;
@@ -114,6 +110,11 @@ public class MapBehavior : MonoBehaviour
 
     private Transform addTile(Tile tile, int tile_type) {
         GameObject goNewTile = Instantiate(this.prTile);
+        if (tile_type == Constants.LAND) {
+            goNewTile.tag = "obstacle";
+        } else {
+            goNewTile.tag = "tile";
+        }
         Transform trNewTile = goNewTile.transform;
         TileBehavior tb = trNewTile.gameObject.GetComponent<TileBehavior>();
         tb.setup(tile, tile_type);

@@ -95,10 +95,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5dd464e16c6ff49b98b681858daddda4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  matWater: {fileID: 2100000, guid: a95d20a8878848748bf3a19b2ece639b, type: 2}
-  matDWater: {fileID: 2100000, guid: 75afc3cf8f4274b9e866dcab422c7b4e, type: 2}
-  matLand: {fileID: 2100000, guid: 57d63d68edac343ac88a0403365f9e8f, type: 2}
-  height: 0.1
+  height: 1
 --- !u!54 &9177410579745084054
 Rigidbody:
   m_ObjectHideFlags: 0

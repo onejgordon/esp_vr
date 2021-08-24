@@ -18,7 +18,8 @@ public class CameraFollowBehavior : MonoBehaviour
     {   
         if (experimentRunner.navigationMode()) {
             gameObject.transform.position = behAgent.overheadCameraPosition();
-            gameObject.transform.eulerAngles = new Vector3(0, behAgent.getHeading(), 0);
+            gameObject.transform.LookAt(behAgent.transform);
+            // gameObject.transform.eulerAngles = new Vector3(0, behAgent.getHeading(), 0);
         }
     }
 

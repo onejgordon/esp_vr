@@ -5,7 +5,6 @@ using UnityEngine;
 public class WallBehavior : MonoBehaviour
 {
     private string id;
-    public float height;
 
 
     void Start()
@@ -13,7 +12,6 @@ public class WallBehavior : MonoBehaviour
 
     }
 
-    // Update is called once per frame
     void Update()
     {
 
@@ -27,22 +25,12 @@ public class WallBehavior : MonoBehaviour
         this.id = wall.id;
     }
 
-    public void makeMesh(Vector2[] points) {
-        bool is3D = true;
+    public void positionAndOrient(Vector2 p1, Vector2 p2) {
+        Vector2 delta = p1 - p2;
+        float theta = -1 * Mathf.Atan2(delta.y, delta.x) * 360 / Mathf.PI / 2;
+        Vector2 mean = (p1 + p2)/2.0f;
+        gameObject.transform.SetPositionAndRotation(new Vector3(mean.x, gameObject.transform.localScale.y/2, mean.y), Quaternion.Euler(0, theta, 0));
 
-        gameObject.transform.parent = this.transform;
-
-        // add PolyExtruder script to newly created GameObject,
-        // keep track of its reference
-        PolyExtruder polyExtruder = gameObject.AddComponent<PolyExtruder>();
-
-        // configure display of outline (before running the poly extruder)
-        // polyExtruder.isOutlineRendered = true;    // default: false
-        // polyExtruder.outlineWidth = 0.1f;         // default: 0.01f
-        // polyExtruder.outlineColor = Color.blue;   // default: Color.black
-
-        // run poly extruder according to input data
-        polyExtruder.createPrism(gameObject.name, this.height, points, Color.black, is3D);        
     }
 
 }

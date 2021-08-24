@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
+
 // using Valve.VR;
 
 
@@ -22,6 +24,7 @@ public class UIBehavior : MonoBehaviour
     // State for confirmation screen
     private bool waitingForTrigger = false;
     private string invokeOnCallback;
+    public ExperimentRunner experimentRunner;
 
     void Start()
     {
@@ -41,9 +44,11 @@ public class UIBehavior : MonoBehaviour
 
         // Check for trigger
         if (waitingForTrigger) {
+            if (Keyboard.current.enterKey.wasPressedThisFrame || Keyboard.current.spaceKey.wasPressedThisFrame) {
+                this.DismissConfirmationScreen();
             // if (grabAction.GetLastStateDown(SteamVR_Input_Sources.Any)) {
             //     DismissConfirmationScreen();
-            // }
+            }
         }
     }
 
@@ -108,8 +113,7 @@ public class UIBehavior : MonoBehaviour
 
     public void DismissConfirmationScreen() {
         HideHUDScreen();
-        ExperimentRunner exp = GameObject.Find("Camera").GetComponent<ExperimentRunner>();
-        exp.Invoke(invokeOnCallback, 0);
+        experimentRunner.Invoke(invokeOnCallback, 0);
         invokeOnCallback = null;
         waitingForTrigger = false;
     }

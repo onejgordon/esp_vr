@@ -13,6 +13,7 @@ public class ExperimentRunner : MonoBehaviour
     private Color DBLUE = new Color(.1f, .1f, 1f);
     private Color DGREEN = new Color(.1f, 1f, .1f);
     private Material goalMat = null;
+    public float planningSeconds = 10.0f;
 
     private const float MAP_MULT = 0.01f;
 
@@ -167,6 +168,9 @@ public class ExperimentRunner : MonoBehaviour
         }
     }
 
+    public void EndTrial() {
+        ui.ShowHUDScreenWithConfirm("Trial finished", Color.blue, "GotoNextTrial");
+    }
 
     void BeginTrial() {
         this.StartPlanningPhase();
@@ -177,7 +181,7 @@ public class ExperimentRunner : MonoBehaviour
         this.mode = "planning";
         this.mapBehavior.setupCameraForPlanning(this.trCamera);
         // Set timeout to start navigation
-        StartCoroutine(WaitThenNavigate(5.0f));
+        StartCoroutine(WaitThenNavigate(this.planningSeconds));
     }
 
     IEnumerator WaitThenNavigate(float waitTime) {

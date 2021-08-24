@@ -246,6 +246,7 @@ MonoBehaviour:
   screenBG: {fileID: 811730593}
   uiImage: {fileID: 2075411011}
   room: {fileID: 571417335}
+  experimentRunner: {fileID: 571417336}
 --- !u!1 &285935540
 GameObject:
   m_ObjectHideFlags: 0
@@ -331,6 +332,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b3baf8bee1a0b248b7b4a5b9185d15c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  planningSeconds: 10
   session: {fileID: 571417338}
   QUICK_DEBUG: 1
   TRIAL_SECS: 120
@@ -1037,6 +1039,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1291347021633416539, guid: 5c3a14d4c81ed4f7689a3c9fcd881583,
+        type: 3}
+      propertyPath: baseVelocity
+      value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 1291347021633416539, guid: 5c3a14d4c81ed4f7689a3c9fcd881583,
+        type: 3}
+      propertyPath: rotationSpeed
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1291347021633416539, guid: 5c3a14d4c81ed4f7689a3c9fcd881583,
+        type: 3}
+      propertyPath: experimentRunner
+      value: 
+      objectReference: {fileID: 571417336}
     - target: {fileID: 8876699624500713000, guid: 5c3a14d4c81ed4f7689a3c9fcd881583,
         type: 3}
       propertyPath: m_Name
