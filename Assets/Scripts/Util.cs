@@ -12,18 +12,10 @@ using UnityEngine;
         return (System.DateTime.UtcNow - epochStart).TotalMilliseconds / 1000.0;
    }
 
-   public static void AddCardPattern(Transform card, string pattern) {
-      Transform face = card.GetChild(0);
-      SetImage(face.gameObject, "Images/" + pattern);
-   }
-
    public static void SetImage(GameObject target, string image_name) {
      Sprite s = Resources.Load<Sprite>(image_name);
      target.GetComponent<SpriteRenderer>().sprite = s;
    }
 
-  // public static void SetImage(Image target, string image_name) {
-  //    Sprite s = Resources.Load<Sprite>(image_name);
-  //    target.GetComponent<Image>().sprite = s;
-  //  }
+
  }

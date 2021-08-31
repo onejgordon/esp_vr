@@ -10,11 +10,13 @@ public class SessionTrial
     private string session_id; // Unique id for each subject/session
     public int trial_id;
     public int reward = 0;
+    public float reward_uncertainty;
     public double ts_start;
     public double ts_end;
 
     public bool practice = false;
 
+    public List<string> rewards_present;
     public List<Fixation> fixations;
     public List<Record> records;
 
@@ -26,11 +28,20 @@ public class SessionTrial
         this.trial_id = id;
         this.ts_start = Util.timestamp();
         this.reward = 0;
+        this.reward_uncertainty = 0.5f;
+        this.rewards_present = new List<string>();
         this.practice = practice;
         this.fixations = new List<Fixation>();
         this.records = new List<Record>();
+        this.randomizeRewardPresence();
     }
 
+    public void randomizeRewardPresence() {
+        foreach (string reward_id in this.map.goal_slot_ids) {
+            bool present = Random.value < this.reward_uncertainty;
+            if (present) this.rewards_present.Add(reward_id);
+        }
+    }
     public void Finished() {
         this.ts_end = Util.timestamp();
     }

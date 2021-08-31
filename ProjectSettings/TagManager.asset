@@ -8,6 +8,7 @@ TagManager:
   - NotGazeFocusable
   - obstacle
   - tile
+  - reward
   layers:
   - Default
   - TransparentFX

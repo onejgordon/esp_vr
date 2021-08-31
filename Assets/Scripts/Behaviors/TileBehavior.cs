@@ -48,8 +48,7 @@ public class TileBehavior : MonoBehaviour
     public void makeMesh(Vector2[] points) {
         bool is3D = true;
         float true_height = this.height;
-        if (this.tile_type == Constants.LAND) true_height *= 2.0f; // Raised land
-        gameObject.transform.parent = this.transform;
+        if (this.tile_type == Constants.LAND) true_height *= 1.5f; // Raised land
 
         // add PolyExtruder script to newly created GameObject,
         // keep track of its reference
@@ -61,6 +60,7 @@ public class TileBehavior : MonoBehaviour
         // polyExtruder.outlineColor = Color.blue;   // default: Color.black
 
         polyExtruder.createPrism(gameObject.name, true_height, points, this.tileColor(), is3D);        
+        gameObject.transform.Translate(0, -this.height, 0); // Water top at y=0
     }
 
 }

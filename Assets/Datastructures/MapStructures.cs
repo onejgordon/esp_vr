@@ -28,7 +28,7 @@ public class Tile {
     public string pid1;
     public string pid2;
     public string pid3;
-
+    public Vector2 centroid;
 
     public Tile() {
 
@@ -53,10 +53,12 @@ public class MapDef {
 
     public List<string> wall_ids;
     public List<int> tile_types;
+    public List<string> goal_slot_ids;
 
     public MapDef() {
         this.wall_ids = new List<string>();
         this.tile_types = new List<int>();
+        this.goal_slot_ids = new List<string>();
     }
 }
 

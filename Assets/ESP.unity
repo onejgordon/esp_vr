@@ -293,6 +293,7 @@ MonoBehaviour:
   map:
     wall_ids: []
     tile_types: 
+    goal_slot_ids: []
   baseMapDef:
     walls: []
     points: []
@@ -302,6 +303,7 @@ MonoBehaviour:
   baseMapLoaded: 0
   prWall: {fileID: 3076895990533114452, guid: 56fb81fe2b048426788a1210696e000b, type: 3}
   prTile: {fileID: 3076895990533114452, guid: 62df3a520ac0d4776832aa6afc907171, type: 3}
+  prReward: {fileID: 853260708297306885, guid: a2416e9cb5be09d4884272dbde056ca8, type: 3}
 --- !u!1 &571417335
 GameObject:
   m_ObjectHideFlags: 0
@@ -332,7 +334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b3baf8bee1a0b248b7b4a5b9185d15c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  planningSeconds: 10
+  planningSeconds: 5
   session: {fileID: 571417338}
   QUICK_DEBUG: 1
   TRIAL_SECS: 120
@@ -905,6 +907,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   behAgent: {fileID: 775975279}
   experimentRunner: {fileID: 571417336}
+  distance: 3
+  height: 1
+  damping: 5
+  pitchAtHorizon: 1
+  smoothRotation: 1
+  followBehind: 1
+  rotationDamping: 10
 --- !u!1 &2075411011
 GameObject:
   m_ObjectHideFlags: 0
@@ -1043,6 +1052,11 @@ PrefabInstance:
         type: 3}
       propertyPath: baseVelocity
       value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 1291347021633416539, guid: 5c3a14d4c81ed4f7689a3c9fcd881583,
+        type: 3}
+      propertyPath: debug_static
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1291347021633416539, guid: 5c3a14d4c81ed4f7689a3c9fcd881583,
         type: 3}

@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: GoalMat
+  m_Name: PlaceholderMat
   m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
   m_ShaderKeywords: _EMISSION
   m_LightmapFlags: 1
@@ -74,4 +74,5 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 0, g: 1, b: 0.051671505, a: 1}
-    - _EmissionColor: {r: 0.44705883, g: 1.4980392, b: 0.5411765, a: 1}
+    - _EmissionColor: {r: 0.00087316177, g: 0.002925858, b: 0.0010569853, a: 1}
+  m_BuildTextureStacks: []

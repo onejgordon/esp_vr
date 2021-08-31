@@ -192,8 +192,8 @@ public class ExperimentRunner : MonoBehaviour
     void StartNavigationPhase() {
         this.mode = "navigation";
         this.trAgent.gameObject.SetActive(true);
-        this.mapBehavior.setupCameraForNavigation(this.trCamera);
         this.mapBehavior.setupAgentForNavigation(this.trAgent);
+        this.mapBehavior.showExistingRewards(this.getCurrentTrial().rewards_present);
     }
 
     public void FinishTrial() {

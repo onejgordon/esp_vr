@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using Random = UnityEngine.Random;
 
 public class MapBehavior : MonoBehaviour
 {
@@ -10,10 +11,12 @@ public class MapBehavior : MonoBehaviour
     public bool baseMapLoaded = false;
     private List<GameObject> tiles; 
     private List<GameObject> walls;
+    private List<GameObject> rewards; 
 
     // Prefabs
     public GameObject prWall;
     public GameObject prTile;
+    public GameObject prReward;
 
 
     void Start()
@@ -41,7 +44,7 @@ public class MapBehavior : MonoBehaviour
                 this.baseMapDef.init();
                 this.baseMapLoaded = true;
             }
-            this.initialize();
+            this.initialize(0.5f);
         } else Debug.Log(string.Format("{0} doesn't exist", path));
     }
 
@@ -60,12 +63,20 @@ public class MapBehavior : MonoBehaviour
             }
             this.tiles.Clear();
         }
+        if (this.rewards != null) {
+            for (int i=0; i<this.rewards.Count; i++) {
+                Destroy(this.rewards[i].gameObject);
+            }
+            this.rewards.Clear();
+        }
+
     }
 
-    public void initialize() {
+    public void initialize(float uncertainty) {
         Debug.Log("Map init");
         this.walls = new List<GameObject>();
         this.tiles = new List<GameObject>();   
+        this.rewards = new List<GameObject>();   
         for (int i=0; i<this.map.wall_ids.Count; i++) {
             Wall wall = this.baseMapDef.getWall(this.map.wall_ids[i]);
             Transform trWall = this.addWall(wall);
@@ -75,6 +86,9 @@ public class MapBehavior : MonoBehaviour
             int tile_type = this.map.tile_types[j];
             Transform trTile = this.addTile(tile, tile_type);
         }
+        for (int i=0; i<this.map.goal_slot_ids.Count; i++) {
+            this.addReward(this.map.goal_slot_ids[i]);
+        }
     }
 
     public void setupCameraForPlanning(Transform trCamera) {
@@ -83,10 +97,11 @@ public class MapBehavior : MonoBehaviour
         );
     }
 
-    public void setupCameraForNavigation(Transform trCamera) {
-        trCamera.SetPositionAndRotation(new Vector3(this.baseMapDef.start[0], Constants.CAM_NAV_HEIGHT, this.baseMapDef.start[1]),
-            Quaternion.Euler(90, 0, 0)
-        );
+    public void showExistingRewards(List<string> rewards_present) {
+        foreach (GameObject reward in this.rewards) {
+            RewardBehavior rb = reward.GetComponent<RewardBehavior>();
+            rb.setPresence(rewards_present.Contains(rb.id));
+        }
     }
 
     public void setupAgentForNavigation(Transform trAgent) {
@@ -131,4 +146,16 @@ public class MapBehavior : MonoBehaviour
         return trNewTile;
     }
 
+    private Transform addReward(string at_tile_id) {
+        Tile tile = this.baseMapDef.getTile(at_tile_id);
+        Vector3 pos = new Vector3(tile.centroid.x, Constants.REWARD_HEIGHT, tile.centroid.y);
+        GameObject goReward = Instantiate(this.prReward, pos, Quaternion.identity, gameObject.transform);
+        goReward.tag = "reward";
+        Transform trReward = goReward.transform;
+        RewardBehavior rb = goReward.GetComponent<RewardBehavior>();
+        rb.setup(at_tile_id);
+        trReward.name = "Reward" + at_tile_id;
+        this.rewards.Add(goReward);
+        return trReward;
+    }
 }

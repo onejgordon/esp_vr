@@ -10,7 +10,7 @@ public class AgentBehavior : MonoBehaviour
     private float velocity;
     public float rotationSpeed = 1.0f;
     public ExperimentRunner experimentRunner;
-
+    public bool debug_static = false;
 
     void Start()
     {
@@ -19,8 +19,8 @@ public class AgentBehavior : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {
-        gameObject.transform.Translate(new Vector3(0, 0, velocity));
+    {   
+        if (!this.debug_static) gameObject.transform.Translate(new Vector3(0, 0, velocity));
 
         if(Keyboard.current.leftArrowKey.isPressed) {
             this.turn(-1);
@@ -29,25 +29,33 @@ public class AgentBehavior : MonoBehaviour
         }
     }
 
+    public Transform getTransform() {
+        return gameObject.transform;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Collided with " + other.gameObject.name);
-        if (other.gameObject.CompareTag("obstacle")) {
+        this.handleCollision(other.gameObject);
+    }
+
+    public void handleCollision(GameObject collideGameObject) {
+        Debug.Log("Collided with " + collideGameObject.name);
+        if (collideGameObject.CompareTag("obstacle")) {
             experimentRunner.EndTrial();
-        } else if (other.gameObject.CompareTag("tile")) {
-            TileBehavior tb = other.gameObject.GetComponent<TileBehavior>();
+        } else if (collideGameObject.CompareTag("tile")) {
+            TileBehavior tb = collideGameObject.GetComponent<TileBehavior>();
             float velocity_mult = tb.tileVelocityMult();
             this.velocity = this.baseVelocity * velocity_mult;
             Debug.Log("Moved into tile, new velocity " + velocity_mult.ToString());
+        } else if (collideGameObject.CompareTag("reward")) {
+            RewardBehavior rb = collideGameObject.GetComponent<RewardBehavior>();
+            rb.consume();
+            this.experimentRunner.getCurrentTrial().reward += 1;
         }
     }
 
     public void turn(int direction) {
         gameObject.transform.Rotate(Vector3.up, direction * rotationSpeed);
-    }
-
-    public Vector3 overheadCameraPosition() {
-        return new Vector3(gameObject.transform.position.x, Constants.CAM_NAV_HEIGHT, gameObject.transform.position.z - Constants.CAM_NAV_BEHIND_DIST);
     }
 
     public float getHeading() {
