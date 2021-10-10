@@ -41,7 +41,7 @@ public class ExperimentRunner : MonoBehaviour
 
     // Main experiment objects
 
-    private Transform trCamera;
+    private Transform trCameraRig;
     public Transform trAgent;
     private Transform controller;
 
@@ -67,7 +67,7 @@ public class ExperimentRunner : MonoBehaviour
         this.session.data.left_handed = this.left_handed;
         this.practice_remaining = this.practice_rounds;
         this.ui = GameObject.Find("UICanvas").GetComponent<UIBehavior>();
-        this.trCamera = GameObject.Find("Camera").GetComponent<Transform>();
+        this.trCameraRig = GameObject.Find("[CameraRig]").GetComponent<Transform>();
         // this.controller = GameObject.FindGameObjectWithTag("Controller").GetComponent<Transform>();
 
         this.mapBehavior = GameObject.Find("Map").GetComponent<MapBehavior>();
@@ -82,7 +82,7 @@ public class ExperimentRunner : MonoBehaviour
     void Update()
     {
         if (recording && this.current_trial != null) {
-            Quaternion hmdRot = trCamera.rotation;
+            Quaternion hmdRot = trCameraRig.rotation;
             // Quaternion ctrlRot = controller.rotation;
             Vector3 gazeOrigin = new Vector3();
             Vector3 gazeDirection = new Vector3();
@@ -178,8 +178,9 @@ public class ExperimentRunner : MonoBehaviour
 
 
     void StartPlanningPhase() {
+        Debug.Log("Start planning...");
         this.mode = "planning";
-        this.mapBehavior.setupCameraForPlanning(this.trCamera);
+        this.mapBehavior.setupCameraForPlanning(this.trCameraRig);
         // Set timeout to start navigation
         StartCoroutine(WaitThenNavigate(this.planningSeconds));
     }
@@ -190,6 +191,7 @@ public class ExperimentRunner : MonoBehaviour
     }
 
     void StartNavigationPhase() {
+        Debug.Log("Start navigation...");
         this.mode = "navigation";
         this.trAgent.gameObject.SetActive(true);
         this.mapBehavior.setupAgentForNavigation(this.trAgent);

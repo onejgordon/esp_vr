@@ -11,6 +11,9 @@ public class AgentBehavior : MonoBehaviour
     public float rotationSpeed = 1.0f;
     public ExperimentRunner experimentRunner;
     public bool debug_static = false;
+    public Transform trController;
+    public float turnAngleMin = 20.0f;
+    public float turnAngleRange = 20.0f;
 
     void Start()
     {
@@ -26,6 +29,14 @@ public class AgentBehavior : MonoBehaviour
             this.turn(-1);
         } else if (Keyboard.current.rightArrowKey.isPressed) {
             this.turn(1);
+        }
+        float controllerYaw = this.trController.localEulerAngles.y;
+        if (controllerYaw > this.turnAngleMin && 
+            controllerYaw < this.turnAngleMin + this.turnAngleRange) {
+            this.turn(1);
+        } else if (controllerYaw < 360.0f-this.turnAngleMin &&
+            controllerYaw > 360.0f-this.turnAngleMin-this.turnAngleRange) {
+            this.turn(-1);
         }
     }
 

@@ -2,13 +2,13 @@
   "source": "Unity",
   "applications": [
     {
-      "app_key": "application.generated.unity.esp.exe",
+      "app_key": "application.generated.unity.cec.exe",
       "launch_type": "url",
       "url": "steam://launch/",
       "action_manifest_path": "C:\\Users\\VR_Research_1\\Documents\\jeremy\\esp_vr\\Assets\\StreamingAssets\\SteamVR\\actions.json",
       "strings": {
         "en_us": {
-          "name": "ESP [Testing]"
+          "name": "cec [Testing]"
         }
       }
     }
