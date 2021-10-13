@@ -182,7 +182,7 @@ public class ExperimentRunner : MonoBehaviour
         this.mode = "planning";
         this.mapBehavior.setupCameraForPlanning(this.trCameraRig);
         // Set timeout to start navigation
-        StartCoroutine(WaitThenNavigate(this.planningSeconds));
+        if (this.planningSeconds > 0) StartCoroutine(WaitThenNavigate(this.planningSeconds));
     }
 
     IEnumerator WaitThenNavigate(float waitTime) {

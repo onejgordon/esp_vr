@@ -105,7 +105,7 @@ public class MapBehavior : MonoBehaviour
     }
 
     public void setupAgentForNavigation(Transform trAgent) {
-        trAgent.position = new Vector3(this.baseMapDef.start[0], 2.0f, this.baseMapDef.start[1] + trAgent.localScale.z);
+        trAgent.position = new Vector3(this.baseMapDef.start[0], 2.0f, this.baseMapDef.start[1] + 2*trAgent.localScale.z);
     }
 
     private Transform addWall(Wall wall) {

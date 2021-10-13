@@ -2,18 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Valve.VR;
 
 public class AgentBehavior : MonoBehaviour
 {
     private string id;
     public float baseVelocity = 0.01f;
     private float velocity;
+    private bool moving = false;
     public float rotationSpeed = 1.0f;
     public ExperimentRunner experimentRunner;
     public bool debug_static = false;
     public Transform trController;
     public float turnAngleMin = 20.0f;
-    public float turnAngleRange = 20.0f;
+    public float turnAngleRange = 40.0f;
+
 
     void Start()
     {
@@ -23,7 +26,7 @@ public class AgentBehavior : MonoBehaviour
     // Update is called once per frame
     void Update()
     {   
-        if (!this.debug_static) gameObject.transform.Translate(new Vector3(0, 0, velocity));
+        
 
         if(Keyboard.current.leftArrowKey.isPressed) {
             this.turn(-1);
@@ -38,6 +41,20 @@ public class AgentBehavior : MonoBehaviour
             controllerYaw > 360.0f-this.turnAngleMin-this.turnAngleRange) {
             this.turn(-1);
         }
+
+        bool forward = SteamVR_Actions._default.GoForward[SteamVR_Input_Sources.RightHand].state;
+        if (forward) {
+            this.moving = true;
+        } else {
+            this.moving = false;
+        }
+
+        if (moving) {
+            gameObject.transform.Translate(new Vector3(0, 0, velocity));
+        }
+        
+
+
     }
 
     public Transform getTransform() {
@@ -50,8 +67,13 @@ public class AgentBehavior : MonoBehaviour
     }
 
     public void handleCollision(GameObject collideGameObject) {
+        if (collideGameObject.name.Contains("Tile")) {
+            // Parent is TileX which contains obstalce tag
+            collideGameObject = collideGameObject.transform.parent.gameObject;
+        }
         Debug.Log("Collided with " + collideGameObject.name);
         if (collideGameObject.CompareTag("obstacle")) {
+            Debug.Log("Hit obstacle");
             experimentRunner.EndTrial();
         } else if (collideGameObject.CompareTag("tile")) {
             TileBehavior tb = collideGameObject.GetComponent<TileBehavior>();

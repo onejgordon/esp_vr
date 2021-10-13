@@ -107,7 +107,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/default/in/grab"
+                     "output" : "/actions/default/in/goforward"
                   }
                },
                "mode" : "button",
@@ -125,7 +125,7 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/default/in/grab"
+                     "output" : "/actions/default/in/goforward"
                   }
                },
                "mode" : "button",
@@ -153,7 +153,7 @@
    "category" : "steamvr_input",
    "controller_type" : "vive_controller",
    "description" : "",
-   "name" : "My cec [Testing] configuration for Vive Controller",
+   "name" : "ESP Binding 2",
    "options" : {},
    "simulated_actions" : []
 }
