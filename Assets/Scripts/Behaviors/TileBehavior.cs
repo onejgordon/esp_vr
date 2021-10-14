@@ -53,7 +53,7 @@ public class TileBehavior : MonoBehaviour
         // add PolyExtruder script to newly created GameObject,
         // keep track of its reference
         PolyExtruder polyExtruder = gameObject.AddComponent<PolyExtruder>();
-
+        
         // configure display of outline (before running the poly extruder)
         // polyExtruder.isOutlineRendered = true;    // default: false
         // polyExtruder.outlineWidth = 0.1f;         // default: 0.01f
