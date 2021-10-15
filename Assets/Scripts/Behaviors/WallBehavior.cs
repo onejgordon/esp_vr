@@ -21,8 +21,8 @@ public class WallBehavior : MonoBehaviour
         return this.id;
     }
 
-    public void setup(Wall wall) {
-        this.id = wall.id;
+    public void setup() {
+        // this.id = wall.id;
     }
 
     public void positionAndOrient(Vector2 p1, Vector2 p2) {

@@ -37,7 +37,7 @@ public class SessionTrial
     }
 
     public void randomizeRewardPresence() {
-        foreach (string reward_id in this.map.goal_slot_ids) {
+        foreach (string reward_id in this.map.reward_slot_ids) {
             bool present = Random.value < this.reward_uncertainty;
             if (present) this.rewards_present.Add(reward_id);
         }

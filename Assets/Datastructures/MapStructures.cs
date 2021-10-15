@@ -36,29 +36,33 @@ public class Tile {
 }
 
 
-[System.Serializable]
-public class Wall {
+// [System.Serializable]
+// public class Wall {
 
-    public string id;
-    public string pid1;
-    public string pid2;
+//     public string id;
+//     public string pid1;
+//     public string pid2;
 
-    public Wall() {
+//     public Wall() {
 
-    }
-}
+//     }
+// }
 
 [System.Serializable]
 public class MapDef {
 
-    public List<string> wall_ids;
+    // public List<string> wall_ids;
+    public int side;
     public List<int> tile_types;
-    public List<string> goal_slot_ids;
+    public string base_map;
+    public List<string> reward_slot_ids;
 
     public MapDef() {
-        this.wall_ids = new List<string>();
+        // this.wall_ids = new List<string>();
+        this.side = 10;
         this.tile_types = new List<int>();
-        this.goal_slot_ids = new List<string>();
+        this.base_map = null;
+        this.reward_slot_ids = new List<string>();
     }
 }
 
@@ -66,7 +70,7 @@ public class MapDef {
 [System.Serializable]
 public class BaseMapDef {
 
-    public List<Wall> walls;
+    // public List<Wall> walls;
     public List<Point> points;
     public List<Tile> tiles;
 
@@ -74,16 +78,16 @@ public class BaseMapDef {
     public List<float> start;  // x,y
 
     public Dictionary<string, Point> pointLookup;
-    public Dictionary<string, Wall> wallLookup;
+    // public Dictionary<string, Wall> wallLookup;
     public Dictionary<string, Tile> tileLookup;
 
     public BaseMapDef() {
-        this.walls = new List<Wall>();
+        // this.walls = new List<Wall>();
         this.tiles = new List<Tile>();
         this.points = new List<Point>();
         this.center = new List<float>();
         this.start = new List<float>();
-        this.wallLookup = new Dictionary<string, Wall>();
+        // this.wallLookup = new Dictionary<string, Wall>();
         this.pointLookup = new Dictionary<string, Point>();
         this.tileLookup = new Dictionary<string, Tile>();
     }
@@ -91,9 +95,9 @@ public class BaseMapDef {
     public void init() {
 
         // Populate lookups
-        foreach (Wall wall in this.walls) {
-            this.wallLookup[wall.id] = wall;
-        }
+        // foreach (Wall wall in this.walls) {
+        //     this.wallLookup[wall.id] = wall;
+        // }
         foreach (Point point in this.points) {
             this.pointLookup[point.id] = point;
         }
@@ -102,9 +106,9 @@ public class BaseMapDef {
         }
     }
 
-    public Wall getWall(string id) {
-        return this.wallLookup[id];
-    }
+    // public Wall getWall(string id) {
+    //     return this.wallLookup[id];
+    // }
 
     public Point getPoint(string id) {
         return this.pointLookup[id];

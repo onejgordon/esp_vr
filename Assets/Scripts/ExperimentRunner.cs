@@ -44,6 +44,7 @@ public class ExperimentRunner : MonoBehaviour
     private Transform trCameraRig;
     public Transform trAgent;
     private Transform controller;
+    public Transform trSceneLight;
 
 
     // Main experiment behaviors
@@ -180,7 +181,7 @@ public class ExperimentRunner : MonoBehaviour
     void StartPlanningPhase() {
         Debug.Log("Start planning...");
         this.mode = "planning";
-        this.mapBehavior.setupCameraForPlanning(this.trCameraRig);
+        this.mapBehavior.setupCameraForPlanning(this.trCameraRig, this.trSceneLight);
         // Set timeout to start navigation
         if (this.planningSeconds > 0) StartCoroutine(WaitThenNavigate(this.planningSeconds));
     }
