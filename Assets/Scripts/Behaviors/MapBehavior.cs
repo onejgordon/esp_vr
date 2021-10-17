@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-using Random = UnityEngine.Random;
+using Valve.VR;
 
 public class MapBehavior : MonoBehaviour
 {
@@ -138,6 +138,7 @@ public class MapBehavior : MonoBehaviour
             goNewTile.tag = "tile";
         }
         Transform trNewTile = goNewTile.transform;
+        goNewTile.AddComponent<HighlightAtGaze2>();
         TileBehavior tb = trNewTile.gameObject.GetComponent<TileBehavior>();
         tb.setup(tile, tile_type);
         List<Vector2> points = new List<Vector2>();

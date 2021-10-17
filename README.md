@@ -4,7 +4,9 @@
 
 Tested with:
 
-- Steam VR Plugin (2.2.0 or 2.5.0)
-- Unity editor (2019.3.0f6)
-- Steam VR 1.9.16
+- OpenVR XR Plugin (1.1.4)
+- Tobii XR SDK (3.0.1)
+- Unity editor (2021.1.24f1)
+- Steam VR 1.19.7
 - Unity Hub 2.2.2
+- SRAnipal SDK 1.3.2
