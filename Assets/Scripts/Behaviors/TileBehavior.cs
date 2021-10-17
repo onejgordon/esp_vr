@@ -71,7 +71,11 @@ public class TileBehavior : MonoBehaviour
         // polyExtruder.outlineColor = Color.blue;   // default: Color.black
 
         polyExtruder.createPrism(gameObject.name, this.tileHeight(), points, this.tileColor(), is3D);        
-        gameObject.transform.Translate(0, -this.height, 0); // Water top at y=0
+        // gameObject.transform.Translate(0, -this.height, 0); // Water top at y=0
+
+        // MeshCollider coll = gameObject.AddComponent<MeshCollider>();
+        // coll.convex = true;
+        // coll.isTrigger = true;
     }
 
 }

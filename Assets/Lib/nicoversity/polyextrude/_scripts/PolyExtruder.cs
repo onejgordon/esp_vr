@@ -385,10 +385,11 @@ public class PolyExtruder : MonoBehaviour
 			// assign indices and vertices and create mesh
 			redrawMesh(this.surroundMesh, verticesS, indicesS);
 
-            /*
+            
             // reset mesh collider after (re-)creation (not needed right now since no mesh collider is attached)
 			goS.GetComponent<MeshCollider>().sharedMesh = this.surroundMesh;
 			
+            /*
 			// generate a simple UV map
 			Vector2[] uvsS = new Vector2[this.surroundMesh.vertices.Length];
 			for (int i = 0; i < uvsS.Length; i++)
@@ -399,9 +400,10 @@ public class PolyExtruder : MonoBehaviour
 			*/
 
             // note: for 3D prism, only keep top mesh collider activated (adapt to own preferences this if needed)
+            // ESP needs surround collisions, so enabled that too.
             goB.GetComponent<MeshCollider>().enabled = false;
             goT.GetComponent<MeshCollider>().enabled = true;
-            goS.GetComponent<MeshCollider>().enabled = false;
+            goS.GetComponent<MeshCollider>().enabled = true;
         }
 
         // set height and color

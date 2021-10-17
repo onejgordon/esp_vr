@@ -13,7 +13,8 @@ public class ExperimentRunner : MonoBehaviour
     private Color DBLUE = new Color(.1f, .1f, 1f);
     private Color DGREEN = new Color(.1f, 1f, .1f);
     private Material goalMat = null;
-    public float planningSeconds = 10.0f;
+    public int planningSeconds = 10;
+    public int navigationSeconds = 30;
 
     private const float MAP_MULT = 0.01f;
 
@@ -111,6 +112,10 @@ public class ExperimentRunner : MonoBehaviour
         return (Util.timestamp() - this.ts_exp_start) / 60;
     }
 
+    public bool isNavigating() {
+        return this.mode == "navigation";
+    }
+
     void RandomizeTrialOrder() {
         // TODO
         this.map_order = Enumerable.Range(1, N_TRIALS).ToList();
@@ -138,6 +143,7 @@ public class ExperimentRunner : MonoBehaviour
 
     void RunOneTrial() {
         Debug.Log("Running trial " + this.trial_index.ToString());
+        this.ui.HideHUDScreen();
         bool first_real = false;
         int map_index = this.map_order[this.trial_index - this.practice_rounds - 1];
         this.mapBehavior.load(map_index);
@@ -169,40 +175,10 @@ public class ExperimentRunner : MonoBehaviour
         }
     }
 
-    public void EndTrial() {
-        ui.ShowHUDScreenWithConfirm("Trial finished", Color.blue, "GotoNextTrial");
-    }
-
-    void BeginTrial() {
-        this.StartPlanningPhase();
-    }
-
-
-    void StartPlanningPhase() {
-        Debug.Log("Start planning...");
-        this.mode = "planning";
-        this.mapBehavior.setupCameraForPlanning(this.trCameraRig, this.trSceneLight);
-        // Set timeout to start navigation
-        if (this.planningSeconds > 0) StartCoroutine(WaitThenNavigate(this.planningSeconds));
-    }
-
-    IEnumerator WaitThenNavigate(float waitTime) {
-        yield return new WaitForSeconds(waitTime);
-        StartNavigationPhase();
-    }
-
-    void StartNavigationPhase() {
-        Debug.Log("Start navigation...");
-        this.mode = "navigation";
-        this.trAgent.gameObject.SetActive(true);
-        this.mapBehavior.setupAgentForNavigation(this.trAgent);
-        this.mapBehavior.showExistingRewards(this.getCurrentTrial().rewards_present);
-    }
-
-    public void FinishTrial() {
-        // Score selection and save trial to session
+    public void EndTrialAndWait() {
+        this.trAgent.gameObject.SetActive(false); // Hide agent
         ui.ClearCountdown();
-        ui.ShowHUDMessage("Trial complete");
+        ui.ShowHUDScreenWithConfirm("Trial finished", Color.blue, "GotoNextTrial");
 
         this.current_trial.Finished();
         this.current_trial.SaveToFile();
@@ -213,7 +189,45 @@ public class ExperimentRunner : MonoBehaviour
             // Time limit, clear timer to avoid double GoTo
             CancelInvoke();
         }
-        Invoke("GotoNextTrial", 2);
+    }
+
+    void BeginTrial() {
+        this.StartPlanningPhase();
+    }
+
+
+    void StartPlanningPhase() {
+        Debug.Log("Start planning...");
+        this.mode = "planning";
+        this.trAgent.gameObject.SetActive(true);
+        this.mapBehavior.setupCameraForPlanning(this.trCameraRig, this.trSceneLight);
+        this.mapBehavior.setupAgentForPlanning(this.trAgent);
+        // Set timeout to start navigation
+        if (this.planningSeconds > 0) {
+            StartCoroutine(WaitThenNavigate(this.planningSeconds));
+            ui.ShowHUDCountdownMessage(this.planningSeconds, "Navigation will start in... ");
+        }
+    }
+
+    IEnumerator WaitThenNavigate(float waitTime) {
+        yield return new WaitForSeconds(waitTime);
+        StartNavigationPhase();
+    }
+
+    void StartNavigationPhase() {
+        Debug.Log("Start navigation...");
+        this.mode = "navigation";        
+        this.mapBehavior.setupAgentForNavigation(this.trAgent);
+        this.mapBehavior.showExistingRewards(this.getCurrentTrial().rewards_present);
+        if (this.navigationSeconds > 0) {
+            StartCoroutine(WaitThenEndTrial(this.navigationSeconds));
+            ui.ShowHUDCountdownMessage(this.navigationSeconds, "Collect rewards");
+        }
+    }
+
+    IEnumerator WaitThenEndTrial(float waitTime) {
+        yield return new WaitForSeconds(waitTime);
+        EndTrialAndWait();
     }
 
     public SessionTrial getCurrentTrial() {

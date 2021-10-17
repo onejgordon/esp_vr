@@ -105,9 +105,15 @@ public class MapBehavior : MonoBehaviour
         }
     }
 
-    public void setupAgentForNavigation(Transform trAgent) {
-        trAgent.position = new Vector3(this.baseMapDef.start[0], 1.0f, this.baseMapDef.start[1] + 3*trAgent.localScale.z);
+    public void setupAgentForPlanning(Transform trAgent) {
+        trAgent.position = new Vector3(this.baseMapDef.start[0], 2.0f, this.baseMapDef.start[1] + 3*trAgent.localScale.z);
+        trAgent.rotation = Quaternion.Euler(0, 0, 0);
     }
+
+    public void setupAgentForNavigation(Transform trAgent) {
+        // trAgent.position = new Vector3(this.baseMapDef.start[0], 2.0f, this.baseMapDef.start[1] + 3*trAgent.localScale.z);
+    }
+
 
     // private Transform addWall(Wall wall) {
     //     GameObject goNewWall = Instantiate(this.prWall);
