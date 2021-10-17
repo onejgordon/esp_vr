@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
-
-// using Valve.VR;
+using Valve.VR;
 
 
 
@@ -15,7 +14,6 @@ public class UIBehavior : MonoBehaviour
     public GameObject screenText;
     public GameObject screenBG; // Panel (background)
     public GameObject uiImage; // Image
-    public GameObject room;
     private float countdown_secs = 0;
     private string countdown_message = null;
 
@@ -29,7 +27,7 @@ public class UIBehavior : MonoBehaviour
     void Start()
     {
         this.UIcanvas = GetComponent<Canvas>();
-
+        ShowHUDMessage("");
     }
 
     // Update is called once per frame
@@ -44,10 +42,9 @@ public class UIBehavior : MonoBehaviour
 
         // Check for trigger
         if (waitingForTrigger) {
-            if (Keyboard.current.enterKey.wasPressedThisFrame || Keyboard.current.spaceKey.wasPressedThisFrame) {
+            bool forward = SteamVR_Actions._default.GoForward[SteamVR_Input_Sources.RightHand].state;
+            if (forward || Keyboard.current.enterKey.wasPressedThisFrame || Keyboard.current.spaceKey.wasPressedThisFrame) {
                 this.DismissConfirmationScreen();
-            // if (grabAction.GetLastStateDown(SteamVR_Input_Sources.Any)) {
-            //     DismissConfirmationScreen();
             }
         }
     }
@@ -70,9 +67,9 @@ public class UIBehavior : MonoBehaviour
         this.screenBG.SetActive(true);
         this.screenText.GetComponent<Text>().text = message;
         this.screenText.SetActive(true);
-        this.room.SetActive(false);
         this.statusHUD.SetActive(false);
     }
+
 
     public void ShowHUDScreenWithConfirm(string message, Color bgcolor,  string callback) {
         invokeOnCallback = callback;
@@ -86,7 +83,6 @@ public class UIBehavior : MonoBehaviour
         this.uiImage.SetActive(true);
         Util.SetImage(this.uiImage, image_path);
         this.screenText.SetActive(false);
-        this.room.SetActive(false);
         this.statusHUD.SetActive(false);
     }
 
@@ -122,7 +118,6 @@ public class UIBehavior : MonoBehaviour
         this.uiImage.SetActive(false);
         this.screenBG.SetActive(false);
         this.screenText.SetActive(false);
-        this.room.SetActive(true);
         this.statusHUD.SetActive(true);
     }
 }
