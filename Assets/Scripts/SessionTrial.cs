@@ -37,11 +37,17 @@ public class SessionTrial
     }
 
     public void randomizeRewardPresence() {
-        foreach (string reward_id in this.map.reward_slot_ids) {
-            bool present = Random.value < this.reward_uncertainty;
-            if (present) this.rewards_present.Add(reward_id);
+        // Currently just sets first to rewards to be present (so fixed per map)
+        int N_REWARDS = 2;
+        for (int i=0; i<this.map.reward_slot_ids.Count; i++) {
+            if (i < N_REWARDS) this.rewards_present.Add(reward_id);
         }
+        // foreach (string reward_id in this.map.reward_slot_ids) {
+        //     bool present = Random.value < this.reward_uncertainty;
+        //     if (present) this.rewards_present.Add(reward_id);
+        // }
     }
+
     public void Finished() {
         this.ts_end = Util.timestamp();
     }

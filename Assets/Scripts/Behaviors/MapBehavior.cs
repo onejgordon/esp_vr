@@ -98,13 +98,6 @@ public class MapBehavior : MonoBehaviour
         trSceneLight.position.Set(this.baseMapDef.center[0], Constants.SCENE_LIGHT_HEIGHT, this.baseMapDef.center[1]);
     }
 
-    public void showExistingRewards(List<string> rewards_present) {
-        foreach (GameObject reward in this.rewards) {
-            RewardBehavior rb = reward.GetComponent<RewardBehavior>();
-            rb.setPresence(rewards_present.Contains(rb.id));
-        }
-    }
-
     public void setupAgentForPlanning(Transform trAgent) {
         trAgent.position = new Vector3(this.baseMapDef.start[0], 2.0f, this.baseMapDef.start[1] + 3*trAgent.localScale.z);
         trAgent.rotation = Quaternion.Euler(0, 0, 0);
@@ -112,6 +105,13 @@ public class MapBehavior : MonoBehaviour
 
     public void setupAgentForNavigation(Transform trAgent) {
         // trAgent.position = new Vector3(this.baseMapDef.start[0], 2.0f, this.baseMapDef.start[1] + 3*trAgent.localScale.z);
+    }
+
+    public void showExistingRewards(List<string> rewards_present) {
+        foreach (GameObject reward in this.rewards) {
+            RewardBehavior rb = reward.GetComponent<RewardBehavior>();
+            rb.setPresence(rewards_present.Contains(rb.id));
+        }
     }
 
 
