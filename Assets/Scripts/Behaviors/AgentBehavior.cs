@@ -16,11 +16,15 @@ public class AgentBehavior : MonoBehaviour
     public Transform trController;
     private Transform trControllerIndicator;
     public float turnAngleMin = 20.0f;
-    public float turnAngleRange = 40.0f;
-
+    public float turnAngleMax = 40.0f;
+    public float turnRate = 0.0f;
+    private Renderer _renderer;
+    private Color turningColor = Color.red;
+    private Color notTurningColor = Color.black;
 
     void Start()
     {
+        this._renderer = trControllerIndicator.gameObject.GetComponent<Renderer>();
         this.trControllerIndicator = gameObject.transform.Find("ControllerIndicator").GetComponent<Transform>();
         this.velocity = this.baseVelocity;
     }
@@ -45,26 +49,35 @@ public class AgentBehavior : MonoBehaviour
     }
 
     public void turnAndTurnIndicator() {
+        // Get yaw from center in (-180, 180)
         float controllerYaw = this.trController.localEulerAngles.y;
+        if (controllerYaw > 180.0f) controllerYaw -= 360.0f
 
         // Update turn indicator
-        // Mathf.Clamp(controllerYaw, -20, 20);
-        this.trControllerIndicator.localRotation = Quaternion.Euler(0, controllerYaw, 0);
+        float clampedYaw = Mathf.Clamp(controllerYaw, -this.turnAngleMax, this.turnAngleMax);
+        this.trControllerIndicator.localRotation = Quaternion.Euler(0, clampedYaw, 0);
 
         // Perform turns
-        if(Keyboard.current.leftArrowKey.isPressed) {
-            this.turn(-1);
-        } else if (Keyboard.current.rightArrowKey.isPressed) {
+        if (controllerYaw > this.turnAngleMax) {
             this.turn(1);
-        }
-        if (controllerYaw > this.turnAngleMin && 
-            controllerYaw < this.turnAngleMin + this.turnAngleRange) {
-            this.turn(1);
-        } else if (controllerYaw < 360.0f-this.turnAngleMin &&
-            controllerYaw > 360.0f-this.turnAngleMin-this.turnAngleRange) {
+        } else if (controllerYaw > this.turnAngleMin) {
+            this.turn(0.5);
+        } else if (controllerYaw < -this.turnAngleMax) {
             this.turn(-1);
+        } else if (controllerYaw < -this.turnAngleMin) {
+            this.turn(-0.5);
         }
+    }
 
+    public void turn(int tr) {
+        bool rateChange = tr != this.turnRate;
+        this.turnRate = tr;
+        gameObject.transform.Rotate(Vector3.up, tr * rotationSpeed);
+        if (rateChange) {
+            // Maybe change mat
+            if (tr > 0.0f) this._renderer.material.SetColor(this.turningColor);
+            else this._renderer.material.SetColor(this.notTurningColor);
+        }
     }
 
     public Transform getTransform() {
@@ -95,10 +108,6 @@ public class AgentBehavior : MonoBehaviour
             rb.consume();
             this.experimentRunner.getCurrentTrial().reward += 1;
         }
-    }
-
-    public void turn(int direction) {
-        gameObject.transform.Rotate(Vector3.up, direction * rotationSpeed);
     }
 
     public float getHeading() {
