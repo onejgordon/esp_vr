@@ -86,14 +86,6 @@ public class UIBehavior : MonoBehaviour
         this.statusHUD.SetActive(false);
     }
 
-    public void ShowHUDImageWithDelayedConfirm(string image_path, string callback) {
-        invokeOnCallback = callback;
-        waitingForTrigger = true;
-        waitingForTrigger = false;
-        Invoke("AllowTrigger", 10); // 10 s
-        ShowHUDImage(image_path);
-    }
-
     public void ShowHUDScreenWithDelayedConfirm(string message, Color bgcolor,  string callback) {
         // Same as ShowHUDScreenWithConfirm but disallows confirm until X seconds
         // have passed (e.g. to allow experimenter intervention)

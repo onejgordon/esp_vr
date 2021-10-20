@@ -10,3 +10,9 @@ Tested with:
 - Steam VR 1.19.7
 - Unity Hub 2.2.2
 - SRAnipal SDK 1.3.2
+
+## Issues
+
+1. NoseDirectionProvider used and not Tobii/Vive
+
+* SRanipal SDK running?

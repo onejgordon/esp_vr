@@ -19,13 +19,13 @@ public class AgentBehavior : MonoBehaviour
     public float turnAngleMax = 40.0f;
     public float turnRate = 0.0f;
     private Renderer _renderer;
-    private Color turningColor = Color.red;
-    private Color notTurningColor = Color.black;
+    private Color turningColor = Color.white;
+    private Color notTurningColor = Color.red;
 
     void Start()
     {
-        this._renderer = trControllerIndicator.gameObject.GetComponent<Renderer>();
         this.trControllerIndicator = gameObject.transform.Find("ControllerIndicator").GetComponent<Transform>();
+        this._renderer = trControllerIndicator.gameObject.GetComponentInChildren<Renderer>();
         this.velocity = this.baseVelocity;
     }
 
@@ -51,7 +51,7 @@ public class AgentBehavior : MonoBehaviour
     public void turnAndTurnIndicator() {
         // Get yaw from center in (-180, 180)
         float controllerYaw = this.trController.localEulerAngles.y;
-        if (controllerYaw > 180.0f) controllerYaw -= 360.0f
+        if (controllerYaw > 180.0f) controllerYaw -= 360.0f;
 
         // Update turn indicator
         float clampedYaw = Mathf.Clamp(controllerYaw, -this.turnAngleMax, this.turnAngleMax);
@@ -61,22 +61,24 @@ public class AgentBehavior : MonoBehaviour
         if (controllerYaw > this.turnAngleMax) {
             this.turn(1);
         } else if (controllerYaw > this.turnAngleMin) {
-            this.turn(0.5);
+            this.turn(0.5f);
         } else if (controllerYaw < -this.turnAngleMax) {
             this.turn(-1);
         } else if (controllerYaw < -this.turnAngleMin) {
-            this.turn(-0.5);
+            this.turn(-0.5f);
+        } else {
+            this.turn(0.0f);
         }
     }
 
-    public void turn(int tr) {
+    public void turn(float tr) {
         bool rateChange = tr != this.turnRate;
         this.turnRate = tr;
-        gameObject.transform.Rotate(Vector3.up, tr * rotationSpeed);
+        if (tr != 0.0f) gameObject.transform.Rotate(Vector3.up, tr * rotationSpeed);
         if (rateChange) {
             // Maybe change mat
-            if (tr > 0.0f) this._renderer.material.SetColor(this.turningColor);
-            else this._renderer.material.SetColor(this.notTurningColor);
+            if (tr != 0.0f) this._renderer.material.SetColor("_Color", this.turningColor);
+            else this._renderer.material.SetColor("_Color", this.notTurningColor);
         }
     }
 
@@ -104,7 +106,7 @@ public class AgentBehavior : MonoBehaviour
             this.velocity = this.baseVelocity * velocity_mult;
             // Debug.Log("Moved into tile, new velocity " + velocity_mult.ToString());
         } else if (collideGameObject.CompareTag("reward")) {
-            RewardBehavior rb = collideGameObject.GetComponent<RewardBehavior>();
+            RewardBehavior rb = collideGameObject.GetComponentInParent<RewardBehavior>();
             rb.consume();
             this.experimentRunner.getCurrentTrial().reward += 1;
         }

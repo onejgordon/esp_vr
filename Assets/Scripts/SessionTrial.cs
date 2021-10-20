@@ -40,6 +40,7 @@ public class SessionTrial
         // Currently just sets first to rewards to be present (so fixed per map)
         int N_REWARDS = 2;
         for (int i=0; i<this.map.reward_slot_ids.Count; i++) {
+            string reward_id = this.map.reward_slot_ids[i];
             if (i < N_REWARDS) this.rewards_present.Add(reward_id);
         }
         // foreach (string reward_id in this.map.reward_slot_ids) {

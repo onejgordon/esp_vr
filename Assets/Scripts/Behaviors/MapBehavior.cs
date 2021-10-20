@@ -18,6 +18,9 @@ public class MapBehavior : MonoBehaviour
     public GameObject prTile;
     public GameObject prReward;
     public Transform trSceneLight;
+    public Camera sceneCamera;
+    public CameraFollowBehavior rigFollow;
+    public bool highlightGaze;
 
 
     void Start()
@@ -53,12 +56,6 @@ public class MapBehavior : MonoBehaviour
 
     public void maybeClearMap() {
         Debug.Log("Clear map");
-        // if (this.walls != null) {
-        //     for (int i=0; i<this.walls.Count; i++) {
-        //         Destroy(this.walls[i].gameObject);
-        //     }
-        //     this.walls.Clear();
-        // }
         if (this.tiles != null) {
             for (int i=0; i<this.tiles.Count; i++) {
                 Destroy(this.tiles[i].gameObject);
@@ -98,11 +95,17 @@ public class MapBehavior : MonoBehaviour
             Quaternion.Euler(90, 30, 0) // Look down
         );
         trSceneLight.position.Set(this.baseMapDef.center[0], Constants.SCENE_LIGHT_HEIGHT, this.baseMapDef.center[1]);
+        this.sceneCamera.orthographic = true;
     }
 
     public void setupAgentForPlanning(Transform trAgent) {
         trAgent.rotation = Quaternion.Euler(0, 30, 0);
         trAgent.position = new Vector3(this.baseMapDef.start[0], 2.0f, this.baseMapDef.start[1]) + 3*trAgent.localScale.z * trAgent.forward;
+        this.sceneCamera.orthographic = false;
+    }
+
+    public void setupCameraForNavigation() {
+        this.rigFollow.jumpTo(); // Avoid lerping nauseatingly
     }
 
     public void setupAgentForNavigation(Transform trAgent) {
@@ -125,7 +128,6 @@ public class MapBehavior : MonoBehaviour
             goNewTile.tag = "tile";
         }
         Transform trNewTile = goNewTile.transform;
-        goNewTile.AddComponent<HighlightAtGaze2>();
         TileBehavior tb = trNewTile.gameObject.GetComponent<TileBehavior>();
         tb.setup(tile, tile_type);
         List<Vector2> points = new List<Vector2>();
@@ -137,6 +139,10 @@ public class MapBehavior : MonoBehaviour
         tb.makeMesh(points.ToArray());
         trNewTile.SetParent(gameObject.transform);
         trNewTile.name = "Tile" + tile.id;
+        if (this.highlightGaze) {
+            goNewTile.transform.GetChild(1).gameObject.AddComponent<MyHighlightAtGaze>();
+            goNewTile.transform.GetChild(2).gameObject.AddComponent<MyHighlightAtGaze>();
+        }
         this.tiles.Add(goNewTile);
         return trNewTile;
     }
@@ -145,7 +151,6 @@ public class MapBehavior : MonoBehaviour
         Tile tile = this.baseMapDef.getTile(at_tile_id);
         Vector3 pos = new Vector3(tile.centroid.x, Constants.REWARD_HEIGHT, tile.centroid.y);
         GameObject goReward = Instantiate(this.prReward, pos, Quaternion.identity, gameObject.transform);
-        goReward.tag = "reward";
         Transform trReward = goReward.transform;
         RewardBehavior rb = goReward.GetComponent<RewardBehavior>();
         rb.setup(at_tile_id);

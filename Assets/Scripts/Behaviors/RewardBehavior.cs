@@ -8,10 +8,11 @@ public class RewardBehavior : MonoBehaviour
     private bool present = false;
     public GameObject goCylinder;
     public GameObject goPlaceholder;
+    public ExperimentRunner experimentRunner;
 
     void Start()
     {
-
+        this.experimentRunner = GameObject.Find("World").GetComponent<ExperimentRunner>();
     }
 
     void Update()
@@ -31,8 +32,13 @@ public class RewardBehavior : MonoBehaviour
     }
 
     public void consume() {
-        Debug.Log("Consumed reward");
-        gameObject.SetActive(false);
+        if (this.present) {
+            // Only consume present rewards
+            SessionTrial st = experimentRunner.getCurrentTrial();
+            goCylinder.SetActive(false);
+            st.reward += 1;
+            Debug.Log("Consumed reward, new trial score: " + st.reward.ToString());
+        }
     }
 
 }

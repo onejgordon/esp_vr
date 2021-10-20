@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 // using Valve.VR.Extras;
 using System.IO;
-// using Tobii.XR;
+using Tobii.XR;
 
 public class ExperimentRunner : MonoBehaviour
 {
@@ -15,6 +15,7 @@ public class ExperimentRunner : MonoBehaviour
     private Material goalMat = null;
     public int planningSeconds = 10;
     public int navigationSeconds = 30;
+    public int endTrialPauseSecs = 3;
 
     public SessionSaver session;
     public bool QUICK_DEBUG = true;
@@ -43,6 +44,7 @@ public class ExperimentRunner : MonoBehaviour
     public Transform trAgent;
     private Transform controller;
     public Transform trSceneLight;
+    public Camera sceneCamera;
 
 
     // Main experiment behaviors
@@ -65,15 +67,16 @@ public class ExperimentRunner : MonoBehaviour
         this.session.data.session_id = this.session_id;
         this.session.data.left_handed = this.left_handed;
         this.practice_remaining = this.practice_rounds;
+        this.sceneCamera = GameObject.Find("Camera").GetComponent<Camera>();
         this.ui = GameObject.Find("UICanvas").GetComponent<UIBehavior>();
         this.trCameraRig = GameObject.Find("[CameraRig]").GetComponent<Transform>();
-        // this.controller = GameObject.FindGameObjectWithTag("Controller").GetComponent<Transform>();
+        this.controller = GameObject.FindGameObjectWithTag("Controller").GetComponent<Transform>();
 
         this.mapBehavior = GameObject.Find("Map").GetComponent<MapBehavior>();
         this.maps = new List<MapDef>();
         // TobiiXR_Settings tobii_settings = new TobiiXR_Settings();
         // tobii_settings.FieldOfUse = FieldOfUse.Analytical;
-        // TobiiXR.Start(tobii_settings);
+        // TobiiXR.Start(tobii_settings); Performed by TobiiXR_Initializer?
         this.BeginExperiment();
     }
 
@@ -82,27 +85,23 @@ public class ExperimentRunner : MonoBehaviour
     {
         if (recording && this.current_trial != null) {
             Quaternion hmdRot = trCameraRig.rotation;
-            // Quaternion ctrlRot = controller.rotation;
+            Quaternion ctrlRot = controller.rotation;
             Vector3 gazeOrigin = new Vector3();
             Vector3 gazeDirection = new Vector3();
             float convDistance = -1.0f; // Default when not valid
             bool eitherEyeClosed = false;
-            // var eyeTrackingData = TobiiXR.GetEyeTrackingData(TobiiXR_TrackingSpace.World);
-            // if (eyeTrackingData.GazeRay.IsValid) {
-            //     gazeOrigin = eyeTrackingData.GazeRay.Origin;
-            //     gazeDirection = eyeTrackingData.GazeRay.Direction;
-            // }
-            // eitherEyeClosed = eyeTrackingData.IsLeftEyeBlinking || eyeTrackingData.IsRightEyeBlinking;
-            // if (eyeTrackingData.ConvergenceDistanceIsValid) {
-            //     convDistance = eyeTrackingData.ConvergenceDistance;
-            // }
-            // Record record = new Record(hmdRot, ctrlRot, gazeOrigin, gazeDirection, convDistance, eitherEyeClosed);
-            // this.current_trial.addRecord(record);
+            var eyeTrackingData = TobiiXR.GetEyeTrackingData(TobiiXR_TrackingSpace.World);
+            if (eyeTrackingData.GazeRay.IsValid) {
+                gazeOrigin = eyeTrackingData.GazeRay.Origin;
+                gazeDirection = eyeTrackingData.GazeRay.Direction;
+            }
+            eitherEyeClosed = eyeTrackingData.IsLeftEyeBlinking || eyeTrackingData.IsRightEyeBlinking;
+            if (eyeTrackingData.ConvergenceDistanceIsValid) {
+                convDistance = eyeTrackingData.ConvergenceDistance;
+            }
+            Record record = new Record(hmdRot, ctrlRot, gazeOrigin, gazeDirection, convDistance, eitherEyeClosed);
+            this.current_trial.addRecord(record);
         }
-    }
-
-    public void Calibrate() {
-
     }
 
     private double minutes_in() {
@@ -114,8 +113,7 @@ public class ExperimentRunner : MonoBehaviour
     }
 
     void RandomizeTrialOrder() {
-        // TODO
-        this.map_order = Enumerable.Range(1, N_TRIALS).ToList();
+        this.map_order = Util.Shuffle<int>(Enumerable.Range(1, N_TRIALS).ToList());
         Debug.Log(map_order.ToString());
     }
 
@@ -200,10 +198,11 @@ public class ExperimentRunner : MonoBehaviour
         Debug.Log("Start navigation...");
         this.mode = "navigation";        
         this.mapBehavior.setupAgentForNavigation(this.trAgent);
+        this.mapBehavior.setupCameraForNavigation();
         this.mapBehavior.showExistingRewards(this.getCurrentTrial().rewards_present);
         if (this.navigationSeconds > 0) {
             StartCoroutine(EndTrialAfterNavigation(this.navigationSeconds, this.current_trial.trial_id));
-            ui.ShowHUDCountdownMessage(this.navigationSeconds, "Collect rewards");
+            ui.ShowHUDCountdownMessage(this.navigationSeconds, "Collect gems");
         }
     }
 
@@ -218,7 +217,7 @@ public class ExperimentRunner : MonoBehaviour
     public void EndTrial() {
         this.trAgent.gameObject.SetActive(false); // Hide agent
         ui.ClearCountdown();
-        ui.ShowHUDScreen("Trial finished", Color.blue);
+        ui.ShowHUDScreen("Trial finished, starting next trial shortly...", Color.blue);
 
         this.current_trial.Finished();
         this.current_trial.SaveToFile();
@@ -229,7 +228,7 @@ public class ExperimentRunner : MonoBehaviour
             // Time limit, clear timer to avoid double GoTo
             CancelInvoke();
         }
-        Invoke("GotoNextTrial", 3);
+        Invoke("GotoNextTrial", this.endTrialPauseSecs);
     }
 
 
