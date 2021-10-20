@@ -16,11 +16,8 @@ public class ExperimentRunner : MonoBehaviour
     public int planningSeconds = 10;
     public int navigationSeconds = 30;
 
-    private const float MAP_MULT = 0.01f;
-
     public SessionSaver session;
     public bool QUICK_DEBUG = true;
-    public int TRIAL_SECS = 120;
     public int N_TRIALS = 10; // Set to 0 for production. Just for short debug data collection
     public int practice_rounds = 0;
     public bool left_handed = false;
@@ -175,21 +172,6 @@ public class ExperimentRunner : MonoBehaviour
         }
     }
 
-    public void EndTrialAndWait() {
-        this.trAgent.gameObject.SetActive(false); // Hide agent
-        ui.ClearCountdown();
-        ui.ShowHUDScreenWithConfirm("Trial finished", Color.blue, "GotoNextTrial");
-
-        this.current_trial.Finished();
-        this.current_trial.SaveToFile();
-        this.current_trial.CleanUpData(); // Deletes large data once saved
-        session.AddTrial(this.current_trial);
-        this.current_trial = null;
-        if (TRIAL_SECS != -1) {
-            // Time limit, clear timer to avoid double GoTo
-            CancelInvoke();
-        }
-    }
 
     void BeginTrial() {
         this.StartPlanningPhase();
@@ -200,7 +182,7 @@ public class ExperimentRunner : MonoBehaviour
         Debug.Log("Start planning...");
         this.mode = "planning";
         this.trAgent.gameObject.SetActive(true);
-        this.mapBehavior.setupCameraForPlanning(this.trCameraRig, this.trSceneLight);
+        this.mapBehavior.setupCameraForPlanning(this.trCameraRig);
         this.mapBehavior.setupAgentForPlanning(this.trAgent);
         // Set timeout to start navigation
         if (this.planningSeconds > 0) {
@@ -220,15 +202,36 @@ public class ExperimentRunner : MonoBehaviour
         this.mapBehavior.setupAgentForNavigation(this.trAgent);
         this.mapBehavior.showExistingRewards(this.getCurrentTrial().rewards_present);
         if (this.navigationSeconds > 0) {
-            StartCoroutine(WaitThenEndTrial(this.navigationSeconds));
+            StartCoroutine(EndTrialAfterNavigation(this.navigationSeconds, this.current_trial.trial_id));
             ui.ShowHUDCountdownMessage(this.navigationSeconds, "Collect rewards");
         }
     }
 
-    IEnumerator WaitThenEndTrial(float waitTime) {
+    IEnumerator EndTrialAfterNavigation(float waitTime, int currentTrialId) {
         yield return new WaitForSeconds(waitTime);
-        EndTrialAndWait();
+        if (this.current_trial != null && this.current_trial.trial_id == currentTrialId) {
+            Debug.Log("Trial timeout...");
+            EndTrial();
+        }
     }
+
+    public void EndTrial() {
+        this.trAgent.gameObject.SetActive(false); // Hide agent
+        ui.ClearCountdown();
+        ui.ShowHUDScreen("Trial finished", Color.blue);
+
+        this.current_trial.Finished();
+        this.current_trial.SaveToFile();
+        this.current_trial.CleanUpData(); // Deletes large data once saved
+        session.AddTrial(this.current_trial);
+        this.current_trial = null;
+        if (this.navigationSeconds != -1) {
+            // Time limit, clear timer to avoid double GoTo
+            CancelInvoke();
+        }
+        Invoke("GotoNextTrial", 3);
+    }
+
 
     public SessionTrial getCurrentTrial() {
         return this.current_trial;

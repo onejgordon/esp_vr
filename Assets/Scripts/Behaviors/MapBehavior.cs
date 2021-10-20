@@ -17,6 +17,7 @@ public class MapBehavior : MonoBehaviour
     //public GameObject prWall;
     public GameObject prTile;
     public GameObject prReward;
+    public Transform trSceneLight;
 
 
     void Start()
@@ -30,6 +31,7 @@ public class MapBehavior : MonoBehaviour
 
     public void load(int map_num) {
         string path = string.Format("./ExperimentData/Maps/{0}.json", map_num);
+        this.maybeClearMap();
         if (File.Exists(path))
         {
             string dataAsJson = File.ReadAllText(path);
@@ -91,21 +93,22 @@ public class MapBehavior : MonoBehaviour
         }
     }
 
-    public void setupCameraForPlanning(Transform trCamera, Transform trSceneLight) {
+    public void setupCameraForPlanning(Transform trCamera) {
         trCamera.SetPositionAndRotation(new Vector3(this.baseMapDef.center[0], Constants.CAM_PLANNING_HEIGHT, this.baseMapDef.center[1]),
-            Quaternion.Euler(90, 0, 0) // Look down
+            Quaternion.Euler(90, 30, 0) // Look down
         );
         trSceneLight.position.Set(this.baseMapDef.center[0], Constants.SCENE_LIGHT_HEIGHT, this.baseMapDef.center[1]);
     }
 
     public void setupAgentForPlanning(Transform trAgent) {
-        trAgent.position = new Vector3(this.baseMapDef.start[0], 2.0f, this.baseMapDef.start[1] + 3*trAgent.localScale.z);
-        trAgent.rotation = Quaternion.Euler(0, 0, 0);
+        trAgent.rotation = Quaternion.Euler(0, 30, 0);
+        trAgent.position = new Vector3(this.baseMapDef.start[0], 2.0f, this.baseMapDef.start[1]) + 3*trAgent.localScale.z * trAgent.forward;
     }
 
     public void setupAgentForNavigation(Transform trAgent) {
         // trAgent.position = new Vector3(this.baseMapDef.start[0], 2.0f, this.baseMapDef.start[1] + 3*trAgent.localScale.z);
     }
+
 
     public void showExistingRewards(List<string> rewards_present) {
         foreach (GameObject reward in this.rewards) {
@@ -113,22 +116,6 @@ public class MapBehavior : MonoBehaviour
             rb.setPresence(rewards_present.Contains(rb.id));
         }
     }
-
-
-    // private Transform addWall(Wall wall) {
-    //     GameObject goNewWall = Instantiate(this.prWall);
-    //     Transform trNewWall = goNewWall.transform;
-    //     trNewWall.name = "Wall" + wall.id;
-    //     WallBehavior wb = trNewWall.GetComponentInChildren<WallBehavior>();
-    //     wb.setup(wall);
-    //     string[] pids = new string[]{wall.pid1, wall.pid2};
-    //     Vector2 p1 = this.baseMapDef.getPoint(wall.pid1).toVector();
-    //     Vector2 p2 = this.baseMapDef.getPoint(wall.pid2).toVector();        
-    //     wb.positionAndOrient(p1, p2);
-    //     trNewWall.SetParent(gameObject.transform);
-    //     this.walls.Add(goNewWall);
-    //     return trNewWall;
-    // }
 
     private Transform addTile(Tile tile, int tile_type) {
         GameObject goNewTile = Instantiate(this.prTile);

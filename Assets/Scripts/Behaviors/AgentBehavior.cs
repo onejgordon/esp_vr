@@ -32,9 +32,8 @@ public class AgentBehavior : MonoBehaviour
     // Update is called once per frame
     void Update()
     {   
-        this.turnAndTurnIndicator();
-
         if (this.experimentRunner.isNavigating()) {
+            this.turnAndTurnIndicator();
             bool forward = SteamVR_Actions._default.GoForward[SteamVR_Input_Sources.RightHand].state;
             if (forward) {
                 this.moving = true;
@@ -95,10 +94,10 @@ public class AgentBehavior : MonoBehaviour
             // Parent is TileX which contains obstalce tag
             collideGameObject = collideGameObject.transform.parent.gameObject;
         }
-        Debug.Log("Collided with " + collideGameObject.name + " with tag: " + collideGameObject.tag);
+        // Debug.Log("Collided with " + collideGameObject.name + " with tag: " + collideGameObject.tag);
         if (collideGameObject.CompareTag("obstacle")) {
             Debug.Log("Hit obstacle");
-            experimentRunner.EndTrialAndWait();
+            experimentRunner.EndTrial();
         } else if (collideGameObject.CompareTag("tile")) {
             TileBehavior tb = collideGameObject.GetComponent<TileBehavior>();
             float velocity_mult = tb.tileVelocityMult();
