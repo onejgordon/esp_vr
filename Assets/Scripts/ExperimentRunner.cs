@@ -11,7 +11,8 @@ public class ExperimentRunner : MonoBehaviour
     // Configs / params
     private Color SKY_DEFAULT = new Color(.8f, .8f, .8f);
     private Color DBLUE = new Color(.1f, .1f, 1f);
-    private Color DGREEN = new Color(.1f, 1f, .1f);
+    private Color DGREEN = new Color(.1f, .7f, .1f);
+    public int N_CHIMES = 5;
     private Material goalMat = null;
     public int planningSeconds = 10;
     public int navigationSeconds = 30;
@@ -31,6 +32,7 @@ public class ExperimentRunner : MonoBehaviour
     private SessionTrial current_trial;
     private bool recording = false;
     private bool practicing = false;
+    private int chimesPlayed = 0;
     private string mode = "planning";
 
     // Session specs
@@ -52,6 +54,8 @@ public class ExperimentRunner : MonoBehaviour
 
     // Other scene objects
     public UIBehavior ui;
+    public AudioSource chimeAudio;
+
     // public SteamVR_LaserPointer laserPointer;
 
     void Start()
@@ -71,7 +75,7 @@ public class ExperimentRunner : MonoBehaviour
         this.ui = GameObject.Find("UICanvas").GetComponent<UIBehavior>();
         this.trCameraRig = GameObject.Find("[CameraRig]").GetComponent<Transform>();
         this.controller = GameObject.FindGameObjectWithTag("Controller").GetComponent<Transform>();
-
+        this.chimeAudio = GetComponent<AudioSource>();
         this.mapBehavior = GameObject.Find("Map").GetComponent<MapBehavior>();
         this.maps = new List<MapDef>();
         // TobiiXR_Settings tobii_settings = new TobiiXR_Settings();
@@ -102,10 +106,21 @@ public class ExperimentRunner : MonoBehaviour
             Record record = new Record(hmdRot, ctrlRot, gazeOrigin, gazeDirection, convDistance, eitherEyeClosed);
             this.current_trial.addRecord(record);
         }
+
+        this.maybePlayChimes();
     }
 
-    private double minutes_in() {
-        return (Util.timestamp() - this.ts_exp_start) / 60;
+    public void maybePlayChimes() {
+        if (this.navigationMode()) {
+            SessionTrial trial = this.getCurrentTrial();
+            int seconds_from_end = (int)(Util.timestamp() - trial.ts_navigation_start - this.navigationSeconds);
+            int chimes_needed = this.N_CHIMES - seconds_from_end;
+            if (chimes_needed > chimesPlayed) {
+                // Play chime
+                this.chimeAudio.Play();
+                this.chimesPlayed += 1;
+            }
+        }
     }
 
     public bool isNavigating() {
@@ -129,7 +144,6 @@ public class ExperimentRunner : MonoBehaviour
 
     public void GotoNextTrial() {
         this.trial_index += 1;
-        double mins = this.minutes_in();
         if ((N_TRIALS != 0 && this.trial_index > N_TRIALS) || this.trial_index > this.N_TRIALS + this.practice_rounds) Finish();
         else {
             RunOneTrial();
@@ -182,10 +196,12 @@ public class ExperimentRunner : MonoBehaviour
         this.trAgent.gameObject.SetActive(true);
         this.mapBehavior.setupCameraForPlanning(this.trCameraRig);
         this.mapBehavior.setupAgentForPlanning(this.trAgent);
+        this.getCurrentTrial().ts_planning_start = Util.timestamp();
+
         // Set timeout to start navigation
         if (this.planningSeconds > 0) {
             StartCoroutine(WaitThenNavigate(this.planningSeconds));
-            ui.ShowHUDCountdownMessage(this.planningSeconds, "Navigation will start in... ");
+            //ui.ShowHUDCountdownMessage(this.planningSeconds, "Navigation will start in... ");
         }
     }
 
@@ -200,9 +216,11 @@ public class ExperimentRunner : MonoBehaviour
         this.mapBehavior.setupAgentForNavigation(this.trAgent);
         this.mapBehavior.setupCameraForNavigation();
         this.mapBehavior.showExistingRewards(this.getCurrentTrial().rewards_present);
+        this.getCurrentTrial().ts_navigation_start = Util.timestamp();
+        this.chimesPlayed = 0;
         if (this.navigationSeconds > 0) {
             StartCoroutine(EndTrialAfterNavigation(this.navigationSeconds, this.current_trial.trial_id));
-            ui.ShowHUDCountdownMessage(this.navigationSeconds, "Collect gems");
+            //ui.ShowHUDCountdownMessage(this.navigationSeconds, "Collect gems");
         }
     }
 
@@ -236,10 +254,6 @@ public class ExperimentRunner : MonoBehaviour
         return this.current_trial;
     }
 
-    public void SaveToPath(string node_id) {
-        // TODO
-    }
-
     void Finish() {
         Debug.Log("Done, saving...");
         session.data.ts_session_end = Util.timestamp();
@@ -247,23 +261,15 @@ public class ExperimentRunner : MonoBehaviour
         if (this.recording) this.recording = false;
         this.mapBehavior.maybeClearMap();
         string results = "All trials finished!\n\n";
-        double percent = this.session.data.total_points / (double) this.session.data.total_points_possible;
-        int base_compensation = 20;
-        int bonus = 0;
-        if (percent >= .55 && percent < .70) bonus = 3;
-        else if (percent >= .7 && percent < .85) bonus = 4;
-        else if (percent >= .85) bonus = 5;
-        int total = base_compensation + bonus;
-        results += string.Format("Your final score is {0} points of of {1} points possible.\nYour final success rate is {2:0.0}% (${3} bonus, ${4} total).\n\nYour experimenter will help you take off the VR headset.",
+        int total_points_possible = this.session.data.getPointsPossible();
+        double percent = this.session.data.total_points / (double) total_points_possible;
+        results += string.Format("Final score is {0} points of of {1} points possible.\nYour final success rate is {2:0.0}%.\n\nYour experimenter will help you take off the VR headset.",
             this.session.data.total_points,
-            this.session.data.total_points_possible,
-            100.0 * percent,
-            bonus,
-            total
-            );
+            total_points_possible,
+            100.0 * percent
+        );
         ui.ShowHUDScreen(results, DGREEN);
-        Debug.Log(">>>>>> Subject Bonus: $" + bonus.ToString() + " TOTAL: $" + total.ToString());
-        // TobiiXR.Stop();
+        TobiiXR.Stop();
     }
 
     public bool navigationMode() {
