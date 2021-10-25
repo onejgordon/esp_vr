@@ -21,6 +21,7 @@ public class ExperimentRunner : MonoBehaviour
     public SessionSaver session;
     public bool QUICK_DEBUG = true;
     public int N_TRIALS = 10; // Set to 0 for production. Just for short debug data collection
+    public int N_MAPS = 20;
     public int practice_rounds = 0;
     public bool left_handed = false;
     public bool record = false;
@@ -111,9 +112,9 @@ public class ExperimentRunner : MonoBehaviour
     }
 
     public void maybePlayChimes() {
-        if (this.navigationMode()) {
-            SessionTrial trial = this.getCurrentTrial();
-            int seconds_from_end = (int)(Util.timestamp() - trial.ts_navigation_start - this.navigationSeconds);
+        SessionTrial trial = this.getCurrentTrial();
+        if (this.navigationMode() && trial != null) {
+            int seconds_from_end = (int)(this.navigationSeconds - (Util.timestamp() - trial.ts_navigation_start));
             int chimes_needed = this.N_CHIMES - seconds_from_end;
             if (chimes_needed > chimesPlayed) {
                 // Play chime
@@ -128,7 +129,7 @@ public class ExperimentRunner : MonoBehaviour
     }
 
     void RandomizeTrialOrder() {
-        this.map_order = Util.Shuffle<int>(Enumerable.Range(1, N_TRIALS).ToList());
+        this.map_order = Util.Shuffle<int>(Enumerable.Range(1, N_MAPS).ToList());
         Debug.Log(map_order.ToString());
     }
 
@@ -233,6 +234,7 @@ public class ExperimentRunner : MonoBehaviour
     }
 
     public void EndTrial() {
+        this.mode = "ended";
         this.trAgent.gameObject.SetActive(false); // Hide agent
         ui.ClearCountdown();
         ui.ShowHUDScreen("Trial finished, starting next trial shortly...", Color.blue);

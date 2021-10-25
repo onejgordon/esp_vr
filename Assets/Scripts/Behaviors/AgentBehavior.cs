@@ -93,7 +93,7 @@ public class AgentBehavior : MonoBehaviour
 
     public void handleCollision(GameObject collideGameObject) {
         if (collideGameObject.name.Contains("Tile")) {
-            // Parent is TileX which contains obstalce tag
+            // Parent is TileX which may caontain obstacle tag
             collideGameObject = collideGameObject.transform.parent.gameObject;
         }
         // Debug.Log("Collided with " + collideGameObject.name + " with tag: " + collideGameObject.tag);

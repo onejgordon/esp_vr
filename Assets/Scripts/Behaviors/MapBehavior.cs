@@ -100,7 +100,7 @@ public class MapBehavior : MonoBehaviour
 
     public void setupAgentForPlanning(Transform trAgent) {
         trAgent.rotation = Quaternion.Euler(0, 30, 0);
-        trAgent.position = new Vector3(this.baseMapDef.start[0], 2.0f, this.baseMapDef.start[1]) + 3*trAgent.localScale.z * trAgent.forward;
+        trAgent.position = new Vector3(this.baseMapDef.start[0], 3.0f, this.baseMapDef.start[1]) + 3*trAgent.localScale.z * trAgent.forward;
         this.sceneCamera.orthographic = false;
     }
 
