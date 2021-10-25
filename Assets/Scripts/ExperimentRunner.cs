@@ -4,21 +4,24 @@ using System.Linq;
 using UnityEngine;
 // using Valve.VR.Extras;
 using System.IO;
-// using Tobii.XR;
+using Tobii.XR;
 
 public class ExperimentRunner : MonoBehaviour
 {
     // Configs / params
     private Color SKY_DEFAULT = new Color(.8f, .8f, .8f);
     private Color DBLUE = new Color(.1f, .1f, 1f);
-    private Color DGREEN = new Color(.1f, 1f, .1f);
+    private Color DGREEN = new Color(.1f, .7f, .1f);
+    public int N_CHIMES = 5;
     private Material goalMat = null;
     public int planningSeconds = 10;
     public int navigationSeconds = 30;
+    public int endTrialPauseSecs = 3;
 
     public SessionSaver session;
     public bool QUICK_DEBUG = true;
     public int N_TRIALS = 10; // Set to 0 for production. Just for short debug data collection
+    public int N_MAPS = 20;
     public int practice_rounds = 0;
     public bool left_handed = false;
     public bool record = false;
@@ -30,6 +33,7 @@ public class ExperimentRunner : MonoBehaviour
     private SessionTrial current_trial;
     private bool recording = false;
     private bool practicing = false;
+    private int chimesPlayed = 0;
     private string mode = "planning";
 
     // Session specs
@@ -43,6 +47,7 @@ public class ExperimentRunner : MonoBehaviour
     public Transform trAgent;
     private Transform controller;
     public Transform trSceneLight;
+    public Camera sceneCamera;
 
 
     // Main experiment behaviors
@@ -50,6 +55,8 @@ public class ExperimentRunner : MonoBehaviour
 
     // Other scene objects
     public UIBehavior ui;
+    public AudioSource chimeAudio;
+
     // public SteamVR_LaserPointer laserPointer;
 
     void Start()
@@ -65,15 +72,16 @@ public class ExperimentRunner : MonoBehaviour
         this.session.data.session_id = this.session_id;
         this.session.data.left_handed = this.left_handed;
         this.practice_remaining = this.practice_rounds;
+        this.sceneCamera = GameObject.Find("Camera").GetComponent<Camera>();
         this.ui = GameObject.Find("UICanvas").GetComponent<UIBehavior>();
         this.trCameraRig = GameObject.Find("[CameraRig]").GetComponent<Transform>();
-        // this.controller = GameObject.FindGameObjectWithTag("Controller").GetComponent<Transform>();
-
+        this.controller = GameObject.FindGameObjectWithTag("Controller").GetComponent<Transform>();
+        this.chimeAudio = GetComponent<AudioSource>();
         this.mapBehavior = GameObject.Find("Map").GetComponent<MapBehavior>();
         this.maps = new List<MapDef>();
         // TobiiXR_Settings tobii_settings = new TobiiXR_Settings();
         // tobii_settings.FieldOfUse = FieldOfUse.Analytical;
-        // TobiiXR.Start(tobii_settings);
+        // TobiiXR.Start(tobii_settings); Performed by TobiiXR_Initializer?
         this.BeginExperiment();
     }
 
@@ -82,31 +90,38 @@ public class ExperimentRunner : MonoBehaviour
     {
         if (recording && this.current_trial != null) {
             Quaternion hmdRot = trCameraRig.rotation;
-            // Quaternion ctrlRot = controller.rotation;
+            Quaternion ctrlRot = controller.rotation;
             Vector3 gazeOrigin = new Vector3();
             Vector3 gazeDirection = new Vector3();
             float convDistance = -1.0f; // Default when not valid
             bool eitherEyeClosed = false;
-            // var eyeTrackingData = TobiiXR.GetEyeTrackingData(TobiiXR_TrackingSpace.World);
-            // if (eyeTrackingData.GazeRay.IsValid) {
-            //     gazeOrigin = eyeTrackingData.GazeRay.Origin;
-            //     gazeDirection = eyeTrackingData.GazeRay.Direction;
-            // }
-            // eitherEyeClosed = eyeTrackingData.IsLeftEyeBlinking || eyeTrackingData.IsRightEyeBlinking;
-            // if (eyeTrackingData.ConvergenceDistanceIsValid) {
-            //     convDistance = eyeTrackingData.ConvergenceDistance;
-            // }
-            // Record record = new Record(hmdRot, ctrlRot, gazeOrigin, gazeDirection, convDistance, eitherEyeClosed);
-            // this.current_trial.addRecord(record);
+            var eyeTrackingData = TobiiXR.GetEyeTrackingData(TobiiXR_TrackingSpace.World);
+            if (eyeTrackingData.GazeRay.IsValid) {
+                gazeOrigin = eyeTrackingData.GazeRay.Origin;
+                gazeDirection = eyeTrackingData.GazeRay.Direction;
+            }
+            eitherEyeClosed = eyeTrackingData.IsLeftEyeBlinking || eyeTrackingData.IsRightEyeBlinking;
+            if (eyeTrackingData.ConvergenceDistanceIsValid) {
+                convDistance = eyeTrackingData.ConvergenceDistance;
+            }
+            Record record = new Record(hmdRot, ctrlRot, gazeOrigin, gazeDirection, convDistance, eitherEyeClosed);
+            this.current_trial.addRecord(record);
         }
+
+        this.maybePlayChimes();
     }
 
-    public void Calibrate() {
-
-    }
-
-    private double minutes_in() {
-        return (Util.timestamp() - this.ts_exp_start) / 60;
+    public void maybePlayChimes() {
+        SessionTrial trial = this.getCurrentTrial();
+        if (this.navigationMode() && trial != null) {
+            int seconds_from_end = (int)(this.navigationSeconds - (Util.timestamp() - trial.ts_navigation_start));
+            int chimes_needed = this.N_CHIMES - seconds_from_end;
+            if (chimes_needed > chimesPlayed) {
+                // Play chime
+                this.chimeAudio.Play();
+                this.chimesPlayed += 1;
+            }
+        }
     }
 
     public bool isNavigating() {
@@ -114,8 +129,7 @@ public class ExperimentRunner : MonoBehaviour
     }
 
     void RandomizeTrialOrder() {
-        // TODO
-        this.map_order = Enumerable.Range(1, N_TRIALS).ToList();
+        this.map_order = Util.Shuffle<int>(Enumerable.Range(1, N_MAPS).ToList());
         Debug.Log(map_order.ToString());
     }
 
@@ -131,7 +145,6 @@ public class ExperimentRunner : MonoBehaviour
 
     public void GotoNextTrial() {
         this.trial_index += 1;
-        double mins = this.minutes_in();
         if ((N_TRIALS != 0 && this.trial_index > N_TRIALS) || this.trial_index > this.N_TRIALS + this.practice_rounds) Finish();
         else {
             RunOneTrial();
@@ -184,10 +197,12 @@ public class ExperimentRunner : MonoBehaviour
         this.trAgent.gameObject.SetActive(true);
         this.mapBehavior.setupCameraForPlanning(this.trCameraRig);
         this.mapBehavior.setupAgentForPlanning(this.trAgent);
+        this.getCurrentTrial().ts_planning_start = Util.timestamp();
+
         // Set timeout to start navigation
         if (this.planningSeconds > 0) {
             StartCoroutine(WaitThenNavigate(this.planningSeconds));
-            ui.ShowHUDCountdownMessage(this.planningSeconds, "Navigation will start in... ");
+            //ui.ShowHUDCountdownMessage(this.planningSeconds, "Navigation will start in... ");
         }
     }
 
@@ -200,10 +215,13 @@ public class ExperimentRunner : MonoBehaviour
         Debug.Log("Start navigation...");
         this.mode = "navigation";        
         this.mapBehavior.setupAgentForNavigation(this.trAgent);
+        this.mapBehavior.setupCameraForNavigation();
         this.mapBehavior.showExistingRewards(this.getCurrentTrial().rewards_present);
+        this.getCurrentTrial().ts_navigation_start = Util.timestamp();
+        this.chimesPlayed = 0;
         if (this.navigationSeconds > 0) {
             StartCoroutine(EndTrialAfterNavigation(this.navigationSeconds, this.current_trial.trial_id));
-            ui.ShowHUDCountdownMessage(this.navigationSeconds, "Collect rewards");
+            //ui.ShowHUDCountdownMessage(this.navigationSeconds, "Collect gems");
         }
     }
 
@@ -216,9 +234,10 @@ public class ExperimentRunner : MonoBehaviour
     }
 
     public void EndTrial() {
+        this.mode = "ended";
         this.trAgent.gameObject.SetActive(false); // Hide agent
         ui.ClearCountdown();
-        ui.ShowHUDScreen("Trial finished", Color.blue);
+        ui.ShowHUDScreen("Trial finished, starting next trial shortly...", Color.blue);
 
         this.current_trial.Finished();
         this.current_trial.SaveToFile();
@@ -229,16 +248,12 @@ public class ExperimentRunner : MonoBehaviour
             // Time limit, clear timer to avoid double GoTo
             CancelInvoke();
         }
-        Invoke("GotoNextTrial", 3);
+        Invoke("GotoNextTrial", this.endTrialPauseSecs);
     }
 
 
     public SessionTrial getCurrentTrial() {
         return this.current_trial;
-    }
-
-    public void SaveToPath(string node_id) {
-        // TODO
     }
 
     void Finish() {
@@ -248,23 +263,15 @@ public class ExperimentRunner : MonoBehaviour
         if (this.recording) this.recording = false;
         this.mapBehavior.maybeClearMap();
         string results = "All trials finished!\n\n";
-        double percent = this.session.data.total_points / (double) this.session.data.total_points_possible;
-        int base_compensation = 20;
-        int bonus = 0;
-        if (percent >= .55 && percent < .70) bonus = 3;
-        else if (percent >= .7 && percent < .85) bonus = 4;
-        else if (percent >= .85) bonus = 5;
-        int total = base_compensation + bonus;
-        results += string.Format("Your final score is {0} points of of {1} points possible.\nYour final success rate is {2:0.0}% (${3} bonus, ${4} total).\n\nYour experimenter will help you take off the VR headset.",
+        int total_points_possible = this.session.data.getPointsPossible();
+        double percent = this.session.data.total_points / (double) total_points_possible;
+        results += string.Format("Final score is {0} points of of {1} points possible.\nYour final success rate is {2:0.0}%.\n\nYour experimenter will help you take off the VR headset.",
             this.session.data.total_points,
-            this.session.data.total_points_possible,
-            100.0 * percent,
-            bonus,
-            total
-            );
+            total_points_possible,
+            100.0 * percent
+        );
         ui.ShowHUDScreen(results, DGREEN);
-        Debug.Log(">>>>>> Subject Bonus: $" + bonus.ToString() + " TOTAL: $" + total.ToString());
-        // TobiiXR.Stop();
+        TobiiXR.Stop();
     }
 
     public bool navigationMode() {

@@ -22,22 +22,36 @@ public class CameraFollowBehavior : MonoBehaviour
     void Update () {
         Transform target = behAgent.getTransform();
         if (experimentRunner.navigationMode()) {
-            Vector3 wantedPosition;
-            if(followBehind)
-                    wantedPosition = target.TransformPoint(0, height, -distance);
-            else
-                    wantedPosition = target.TransformPoint(0, height, distance);
-
-            transform.position = Vector3.Lerp (transform.position, wantedPosition, Time.deltaTime * damping);
+            transform.position = Vector3.Lerp (transform.position, this.getWantedPosition(), Time.deltaTime * damping);
 
             if (smoothRotation) {
-                    Vector3 targetDelta = target.position - transform.position;
-                    if (pitchAtHorizon) targetDelta.y = 0;
-                    Quaternion wantedRotation = Quaternion.LookRotation(targetDelta, target.up);
-                    transform.rotation = Quaternion.Slerp (transform.rotation, wantedRotation, Time.deltaTime * rotationDamping);
+                    transform.rotation = Quaternion.Slerp (transform.rotation, this.getWantedRotation(), Time.deltaTime * rotationDamping);
             }
             else transform.LookAt (target, target.up);            
         }
+    }
+
+    public Vector3 getWantedPosition() {
+        Transform target = behAgent.getTransform();
+        Vector3 wantedPosition;
+        if(followBehind)
+            wantedPosition = target.TransformPoint(0, height, -distance);
+        else
+            wantedPosition = target.TransformPoint(0, height, distance);
+        return wantedPosition;
+    }
+
+    public Quaternion getWantedRotation() {
+        Transform target = behAgent.getTransform();
+        Vector3 targetDelta = target.position - transform.position;
+        if (pitchAtHorizon) targetDelta.y = 0;
+        Quaternion wantedRotation = Quaternion.LookRotation(targetDelta, target.up);
+        return wantedRotation;
+    }
+
+    public void jumpTo() {
+        transform.position = this.getWantedPosition();
+        transform.rotation = this.getWantedRotation();
     }
 
 }

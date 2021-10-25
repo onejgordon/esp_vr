@@ -1,10 +1,11 @@
 ﻿// Copyright © 2018 – Property of Tobii AB (publ) - All Rights Reserved
 
+
 using Tobii.G2OM;
 using UnityEngine;
 
 //Monobehaviour which implements the "IGazeFocusable" interface, meaning it will be called on when the object receives focus
-public class HighlightAtGaze2 : MonoBehaviour, IGazeFocusable
+public class MyHighlightAtGaze : MonoBehaviour, IGazeFocusable
 {
     private static readonly int _baseColor = Shader.PropertyToID("_BaseColor");
     public Color highlightColor = Color.red;
@@ -21,6 +22,7 @@ public class HighlightAtGaze2 : MonoBehaviour, IGazeFocusable
         if (hasFocus)
         {
             _targetColor = highlightColor;
+            Debug.Log("Got gaze on " + gameObject.name);
         }
         //If this object lost focus, fade the object's color to it's original color
         else

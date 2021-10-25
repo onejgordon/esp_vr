@@ -42,7 +42,7 @@ public class TileBehavior : MonoBehaviour
     public float tileVelocityMult() {
         float vel = 1.0f;
         if (this.tile_type == Constants.WATER) vel = 1.0f;
-        if (this.tile_type == Constants.DEEP_WATER) vel = 0.75f;
+        if (this.tile_type == Constants.DEEP_WATER) vel = Constants.DEEP_WATER_SLOW_MULT;
         return vel;
     }
 

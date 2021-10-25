@@ -11,7 +11,8 @@ public class SessionTrial
     public int trial_id;
     public int reward = 0;
     public float reward_uncertainty;
-    public double ts_start;
+    public double ts_planning_start;
+    public double ts_navigation_start;
     public double ts_end;
 
     public bool practice = false;
@@ -26,7 +27,6 @@ public class SessionTrial
         this.session_id = session_id;
         this.map = map;
         this.trial_id = id;
-        this.ts_start = Util.timestamp();
         this.reward = 0;
         this.reward_uncertainty = 0.5f;
         this.rewards_present = new List<string>();
@@ -40,6 +40,7 @@ public class SessionTrial
         // Currently just sets first to rewards to be present (so fixed per map)
         int N_REWARDS = 2;
         for (int i=0; i<this.map.reward_slot_ids.Count; i++) {
+            string reward_id = this.map.reward_slot_ids[i];
             if (i < N_REWARDS) this.rewards_present.Add(reward_id);
         }
         // foreach (string reward_id in this.map.reward_slot_ids) {

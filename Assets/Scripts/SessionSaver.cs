@@ -15,7 +15,6 @@ public class MySessionData
     public string condition;
     public bool left_handed = false;
     public int total_points = 0;
-    public int total_points_possible = 0;
     public double ts_session_start = 0;
     public double ts_session_end = 0;
 
@@ -25,6 +24,10 @@ public class MySessionData
 
     public void AddTrial(SessionTrial trial) {
         this.trials.Add(trial);
+    }
+
+    public int getPointsPossible() {
+        return this.CountTrials() * Constants.REWARDS_PER_TRIAL;
     }
 }
 
@@ -40,7 +43,6 @@ public class SessionSaver : MonoBehaviour {
             data.AddTrial(trial);
             if (trial.scored()) {
                 data.total_points += trial.reward;
-                data.total_points_possible += 1;
             }
         }
     }
