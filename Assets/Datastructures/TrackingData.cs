@@ -23,7 +23,12 @@ public class Fixation {
 
 [System.Serializable]
 public class Record {
-
+    public float ag_x;
+    public float ag_y;
+    public float ag_z;
+    public float ag_yaw;
+    public float ag_roll;
+    public float ag_pitch;
     public float hmd_yaw;
     public float hmd_roll;
     public float hmd_pitch;
@@ -50,8 +55,16 @@ public class Record {
     public bool blinking;
     public double ts;
 
-    public Record(Quaternion hmd_rot, Quaternion ctr_rot, Vector3 gaze_origin, Vector3 gaze_direction, float convDistance, bool blinking) {
+    public Record(string mode, Transform trAgent, Quaternion hmd_rot, Quaternion ctr_rot, Vector3 gaze_origin, Vector3 gaze_direction, float convDistance, bool blinking) {
+        // TODO: Confirm these are the right way to capture both rot and position
         this.ts = Util.timestamp();
+        this.ag_x = trAgent.position.x;
+        this.ag_y = trAgent.position.y;
+        this.ag_z = trAgent.position.z;
+        Quaternion ag_rot = trAgent.rotation;
+        this.ag_roll  = Mathf.Atan2(2*ag_rot.y*ag_rot.w + 2*ag_rot.x*ag_rot.z, 1 - 2*ag_rot.y*ag_rot.y - 2*ag_rot.z*ag_rot.z);
+        this.ag_pitch = Mathf.Atan2(2*ag_rot.x*ag_rot.w + 2*ag_rot.y*ag_rot.z, 1 - 2*ag_rot.x*ag_rot.x - 2*ag_rot.z*ag_rot.z);
+        this.ag_yaw   =  Mathf.Asin(2*ag_rot.x*ag_rot.y + 2*ag_rot.z*ag_rot.w);
         float hmd_x = hmd_rot.x;
         float hmd_y = hmd_rot.y;
         float hmd_z = hmd_rot.z;

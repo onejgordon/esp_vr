@@ -12,9 +12,10 @@ public class ExperimentRunner : MonoBehaviour
     private Color SKY_DEFAULT = new Color(.8f, .8f, .8f);
     private Color DBLUE = new Color(.1f, .1f, 1f);
     private Color DGREEN = new Color(.1f, .7f, .1f);
-    public int N_CHIMES = 5;
+    public int N_CHIMES = 3;
     private Material goalMat = null;
     public int planningSeconds = 10;
+    public int transitionSeconds = 5;
     public int navigationSeconds = 30;
     public int endTrialPauseSecs = 3;
 
@@ -22,7 +23,7 @@ public class ExperimentRunner : MonoBehaviour
     public bool QUICK_DEBUG = true;
     public int N_TRIALS = 10; // Set to 0 for production. Just for short debug data collection
     public int N_MAPS = 20;
-    public int practice_rounds = 0;
+    public int practice_rounds = 2;
     public bool left_handed = false;
     public bool record = false;
 
@@ -104,7 +105,15 @@ public class ExperimentRunner : MonoBehaviour
             if (eyeTrackingData.ConvergenceDistanceIsValid) {
                 convDistance = eyeTrackingData.ConvergenceDistance;
             }
-            Record record = new Record(hmdRot, ctrlRot, gazeOrigin, gazeDirection, convDistance, eitherEyeClosed);
+            Record record = new Record(
+                this.mode[0],  // First letter of mode in [p, t, n]
+                this.trAgent,
+                hmdRot,
+                ctrlRot,
+                gazeOrigin,
+                gazeDirection,
+                convDistance,
+                eitherEyeClosed);
             this.current_trial.addRecord(record);
         }
 
@@ -112,6 +121,7 @@ public class ExperimentRunner : MonoBehaviour
     }
 
     public void maybePlayChimes() {
+        // TODO: Chimes for end of planning and transition
         SessionTrial trial = this.getCurrentTrial();
         if (this.navigationMode() && trial != null) {
             int seconds_from_end = (int)(this.navigationSeconds - (Util.timestamp() - trial.ts_navigation_start));
@@ -130,6 +140,10 @@ public class ExperimentRunner : MonoBehaviour
 
     void RandomizeTrialOrder() {
         this.map_order = Util.Shuffle<int>(Enumerable.Range(1, N_MAPS).ToList());
+        // Practice maps start at 100
+        for (int i=0; i<this.practice_rounds; i++) {
+            this.map_order.Insert(0, 100 + i)
+        }
         Debug.Log(map_order.ToString());
     }
 
@@ -185,11 +199,9 @@ public class ExperimentRunner : MonoBehaviour
         }
     }
 
-
     void BeginTrial() {
         this.StartPlanningPhase();
     }
-
 
     void StartPlanningPhase() {
         Debug.Log("Start planning...");
@@ -200,10 +212,19 @@ public class ExperimentRunner : MonoBehaviour
         this.getCurrentTrial().ts_planning_start = Util.timestamp();
 
         // Set timeout to start navigation
-        if (this.planningSeconds > 0) {
-            StartCoroutine(WaitThenNavigate(this.planningSeconds));
-            //ui.ShowHUDCountdownMessage(this.planningSeconds, "Navigation will start in... ");
-        }
+        StartCoroutine(WaitThenTransition(this.planningSeconds));
+    }
+
+    IEnumerator WaitThenTransition(float waitTime) {
+        yield return new WaitForSeconds(waitTime);
+        StartTransitionPhase();
+    }
+
+    void StartTransitionPhase() {
+        Debug.Log("Start transition...");
+        this.mode = "transition";
+        // TODO: Make everything invisible, but preserve fixation capture
+        StartCoroutine(WaitThenNavigate(this.transitionSeconds));
     }
 
     IEnumerator WaitThenNavigate(float waitTime) {
