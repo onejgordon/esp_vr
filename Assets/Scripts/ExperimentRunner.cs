@@ -11,8 +11,8 @@ public class ExperimentRunner : MonoBehaviour
     // Configs / params
     private Color SKY_DEFAULT = new Color(.8f, .8f, .8f);
     private Color DBLUE = new Color(.1f, .1f, 1f);
-    private Color DGREEN = new Color(.1f, .7f, .1f);
     public int N_CHIMES = 3;
+    private Color DGREEN = new Color(.1f, .6f, .1f);
     private Material goalMat = null;
     public int planningSeconds = 10;
     public int transitionSeconds = 5;
@@ -90,8 +90,6 @@ public class ExperimentRunner : MonoBehaviour
     void Update()
     {
         if (recording && this.current_trial != null) {
-            Quaternion hmdRot = trCameraRig.rotation;
-            Quaternion ctrlRot = controller.rotation;
             Vector3 gazeOrigin = new Vector3();
             Vector3 gazeDirection = new Vector3();
             float convDistance = -1.0f; // Default when not valid
@@ -106,31 +104,43 @@ public class ExperimentRunner : MonoBehaviour
                 convDistance = eyeTrackingData.ConvergenceDistance;
             }
             Record record = new Record(
-                this.mode[0],  // First letter of mode in [p, t, n]
+                this.mode[0].ToString(),  // First letter of mode in [p, t, n]
                 this.trAgent,
-                hmdRot,
-                ctrlRot,
+                trCameraRig,
+                controller,
                 gazeOrigin,
                 gazeDirection,
                 convDistance,
                 eitherEyeClosed);
             this.current_trial.addRecord(record);
         }
-
         this.maybePlayChimes();
     }
 
+    public int getChimesNeeded(SessionTrial trial) {
+        int chimes_needed = 3 * this.N_CHIMES; // 3 modes, N_CHIMES for each
+        int seconds_from_end = 0;
+        if (this.isPlanning()) {
+            seconds_from_end = (int)(this.planningSeconds - (Util.timestamp() - trial.ts_planning_start));
+            chimes_needed -= seconds_from_end;
+        } else if (this.isTransitioning()) {
+            seconds_from_end = (int)(this.transitionSeconds - (Util.timestamp() - trial.ts_transition_start));
+            chimes_needed -= this.N_CHIMES + seconds_from_end;
+        } else if (this.isNavigating()) {
+            seconds_from_end = (int)(this.navigationSeconds - (Util.timestamp() - trial.ts_navigation_start));
+            chimes_needed -= this.N_CHIMES + seconds_from_end;
+        }
+        return chimes_needed;
+    }
     public void maybePlayChimes() {
-        // TODO: Chimes for end of planning and transition
         SessionTrial trial = this.getCurrentTrial();
-        if (this.navigationMode() && trial != null) {
-            int seconds_from_end = (int)(this.navigationSeconds - (Util.timestamp() - trial.ts_navigation_start));
-            int chimes_needed = this.N_CHIMES - seconds_from_end;
-            if (chimes_needed > chimesPlayed) {
+        if (trial != null) {
+            if (this.getChimesNeeded(trial) > chimesPlayed) {
                 // Play chime
                 this.chimeAudio.Play();
                 this.chimesPlayed += 1;
             }
+
         }
     }
 
@@ -138,11 +148,20 @@ public class ExperimentRunner : MonoBehaviour
         return this.mode == "navigation";
     }
 
+    
+    public bool isPlanning() {
+        return this.mode == "planning";
+    }
+
+    public bool isTransitioning() {
+        return this.mode == "transition";
+    }
+
     void RandomizeTrialOrder() {
         this.map_order = Util.Shuffle<int>(Enumerable.Range(1, N_MAPS).ToList());
         // Practice maps start at 100
         for (int i=0; i<this.practice_rounds; i++) {
-            this.map_order.Insert(0, 100 + i)
+            this.map_order.Insert(0, 100 + i);
         }
         Debug.Log(map_order.ToString());
     }
@@ -223,6 +242,7 @@ public class ExperimentRunner : MonoBehaviour
     void StartTransitionPhase() {
         Debug.Log("Start transition...");
         this.mode = "transition";
+        this.getCurrentTrial().ts_transition_start = Util.timestamp();
         // TODO: Make everything invisible, but preserve fixation capture
         StartCoroutine(WaitThenNavigate(this.transitionSeconds));
     }
@@ -293,9 +313,5 @@ public class ExperimentRunner : MonoBehaviour
         );
         ui.ShowHUDScreen(results, DGREEN);
         TobiiXR.Stop();
-    }
-
-    public bool navigationMode() {
-        return this.mode == "navigation";
     }
 }

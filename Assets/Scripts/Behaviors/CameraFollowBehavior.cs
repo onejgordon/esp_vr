@@ -21,9 +21,8 @@ public class CameraFollowBehavior : MonoBehaviour
     }
     void Update () {
         Transform target = behAgent.getTransform();
-        if (experimentRunner.navigationMode()) {
+        if (experimentRunner.isNavigating()) {
             transform.position = Vector3.Lerp (transform.position, this.getWantedPosition(), Time.deltaTime * damping);
-
             if (smoothRotation) {
                     transform.rotation = Quaternion.Slerp (transform.rotation, this.getWantedRotation(), Time.deltaTime * rotationDamping);
             }

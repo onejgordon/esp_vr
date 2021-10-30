@@ -23,6 +23,7 @@ public class Fixation {
 
 [System.Serializable]
 public class Record {
+    public string mode;
     public float ag_x;
     public float ag_y;
     public float ag_z;
@@ -55,9 +56,10 @@ public class Record {
     public bool blinking;
     public double ts;
 
-    public Record(string mode, Transform trAgent, Quaternion hmd_rot, Quaternion ctr_rot, Vector3 gaze_origin, Vector3 gaze_direction, float convDistance, bool blinking) {
-        // TODO: Confirm these are the right way to capture both rot and position
+
+    public Record(string mode, Transform trAgent, Transform trHMD, Transform trController, Vector3 gaze_origin, Vector3 gaze_direction, float convDistance, bool blinking) {
         this.ts = Util.timestamp();
+        this.mode = mode;
         this.ag_x = trAgent.position.x;
         this.ag_y = trAgent.position.y;
         this.ag_z = trAgent.position.z;
@@ -65,26 +67,30 @@ public class Record {
         this.ag_roll  = Mathf.Atan2(2*ag_rot.y*ag_rot.w + 2*ag_rot.x*ag_rot.z, 1 - 2*ag_rot.y*ag_rot.y - 2*ag_rot.z*ag_rot.z);
         this.ag_pitch = Mathf.Atan2(2*ag_rot.x*ag_rot.w + 2*ag_rot.y*ag_rot.z, 1 - 2*ag_rot.x*ag_rot.x - 2*ag_rot.z*ag_rot.z);
         this.ag_yaw   =  Mathf.Asin(2*ag_rot.x*ag_rot.y + 2*ag_rot.z*ag_rot.w);
-        float hmd_x = hmd_rot.x;
-        float hmd_y = hmd_rot.y;
-        float hmd_z = hmd_rot.z;
-        float hmd_w = hmd_rot.w;
-        this.hmd_roll  = Mathf.Atan2(2*hmd_y*hmd_w + 2*hmd_x*hmd_z, 1 - 2*hmd_y*hmd_y - 2*hmd_z*hmd_z);
-        this.hmd_pitch = Mathf.Atan2(2*hmd_x*hmd_w + 2*hmd_y*hmd_z, 1 - 2*hmd_x*hmd_x - 2*hmd_z*hmd_z);
-        this.hmd_yaw   =  Mathf.Asin(2*hmd_x*hmd_y + 2*hmd_z*hmd_w);
-        this.hmd_x = hmd_x;
-        this.hmd_y = hmd_y;
-        this.hmd_z = hmd_z;
-        float ctr_x = ctr_rot.x;
-        float ctr_y = ctr_rot.y;
-        float ctr_z = ctr_rot.z;
-        float ctr_w = ctr_rot.w;
-        this.ctr_roll  = Mathf.Atan2(2*ctr_y*ctr_w + 2*ctr_x*ctr_z, 1 - 2*ctr_y*ctr_y - 2*ctr_z*ctr_z);
-        this.ctr_pitch = Mathf.Atan2(2*ctr_x*ctr_w + 2*ctr_y*ctr_z, 1 - 2*ctr_x*ctr_x - 2*ctr_z*ctr_z);
-        this.ctr_yaw   =  Mathf.Asin(2*ctr_x*ctr_y + 2*ctr_z*ctr_w);
-        this.ctr_x = ctr_x;
-        this.ctr_y = ctr_y;
-        this.ctr_z = ctr_z;
+        Quaternion hmd_rot = trHMD.rotation;
+        Quaternion ctr_rot = trController.rotation;
+        Vector3 hmd_pos = trHMD.position;
+        Vector3 ctr_pos = trController.position;
+        float hmd_rot_x = hmd_rot.x;
+        float hmd_rot_y = hmd_rot.y;
+        float hmd_rot_z = hmd_rot.z;
+        float hmd_rot_w = hmd_rot.w;
+        this.hmd_roll  = Mathf.Atan2(2*hmd_rot_y*hmd_rot_w + 2*hmd_rot_x*hmd_rot_z, 1 - 2*hmd_rot_y*hmd_rot_y - 2*hmd_rot_z*hmd_rot_z);
+        this.hmd_pitch = Mathf.Atan2(2*hmd_rot_x*hmd_rot_w + 2*hmd_rot_y*hmd_rot_z, 1 - 2*hmd_rot_x*hmd_rot_x - 2*hmd_rot_z*hmd_rot_z);
+        this.hmd_yaw   =  Mathf.Asin(2*hmd_rot_x*hmd_rot_y + 2*hmd_rot_z*hmd_rot_w);
+        this.hmd_x = hmd_pos.x;
+        this.hmd_y = hmd_pos.y;
+        this.hmd_z = hmd_pos.z;
+        float ctr_rot_x = ctr_rot.x;
+        float ctr_rot_y = ctr_rot.y;
+        float ctr_rot_z = ctr_rot.z;
+        float ctr_rot_w = ctr_rot.w;
+        this.ctr_roll  = Mathf.Atan2(2*ctr_rot_y*ctr_rot_w + 2*ctr_rot_x*ctr_rot_z, 1 - 2*ctr_rot_y*ctr_rot_y - 2*ctr_rot_z*ctr_rot_z);
+        this.ctr_pitch = Mathf.Atan2(2*ctr_rot_x*ctr_rot_w + 2*ctr_rot_y*ctr_rot_z, 1 - 2*ctr_rot_x*ctr_rot_x - 2*ctr_rot_z*ctr_rot_z);
+        this.ctr_yaw   =  Mathf.Asin(2*ctr_rot_x*ctr_rot_y + 2*ctr_rot_z*ctr_rot_w);
+        this.ctr_x = ctr_pos.x;
+        this.ctr_y = ctr_pos.y;
+        this.ctr_z = ctr_pos.z;
         if (gaze_origin != null) {
             this.gaze_or_x = gaze_origin.x;
             this.gaze_or_y = gaze_origin.y;
