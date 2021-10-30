@@ -108,8 +108,19 @@ public class AgentBehavior : MonoBehaviour
         } else if (collideGameObject.CompareTag("reward")) {
             RewardBehavior rb = collideGameObject.GetComponentInParent<RewardBehavior>();
             rb.consume();
-            this.experimentRunner.getCurrentTrial().reward += 1;
+            SessionTrial trial = this.experimentRunner.getCurrentTrial();
+            if (trial.allRewardsCollected()) {
+                if (trial.navigationSecondsRemaining() > 5.0f) {
+                    // If enough time remaining, schedule premature end
+                    StartCoroutine(WaitThenEnd(3));
+                }
+            }
         }
+    }
+
+    IEnumerator WaitThenEnd(float waitTime) {
+        yield return new WaitForSeconds(waitTime);
+        experimentRunner.EndTrial();
     }
 
     public float getHeading() {

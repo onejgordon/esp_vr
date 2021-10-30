@@ -9,10 +9,13 @@ public class RewardBehavior : MonoBehaviour
     public GameObject goCylinder;
     public GameObject goPlaceholder;
     public ExperimentRunner experimentRunner;
+    public AudioSource rewardAudio;
+
 
     void Start()
     {
         this.experimentRunner = GameObject.Find("World").GetComponent<ExperimentRunner>();
+        this.rewardAudio = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -37,6 +40,7 @@ public class RewardBehavior : MonoBehaviour
             SessionTrial st = experimentRunner.getCurrentTrial();
             goCylinder.SetActive(false);
             st.reward += 1;
+            this.rewardAudio.Play();
             Debug.Log("Consumed reward, new trial score: " + st.reward.ToString());
         }
     }

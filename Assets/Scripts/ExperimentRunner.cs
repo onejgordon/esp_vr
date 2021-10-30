@@ -16,7 +16,6 @@ public class ExperimentRunner : MonoBehaviour
     private Material goalMat = null;
     public int planningSeconds = 10;
     public int transitionSeconds = 5;
-    public int navigationSeconds = 30;
     public int endTrialPauseSecs = 3;
 
     public SessionSaver session;
@@ -56,6 +55,7 @@ public class ExperimentRunner : MonoBehaviour
 
     // Other scene objects
     public UIBehavior ui;
+    public GameObject goMap;
     public AudioSource chimeAudio;
 
     // public SteamVR_LaserPointer laserPointer;
@@ -63,6 +63,7 @@ public class ExperimentRunner : MonoBehaviour
     void Start()
     {
         this.goalMat =  Resources.Load("GoalMat", typeof(Material)) as Material;
+        this.goMap = GameObject.Find("Map");
         if (QUICK_DEBUG) {
             practice_rounds = 0;
             N_TRIALS = 5;
@@ -78,7 +79,7 @@ public class ExperimentRunner : MonoBehaviour
         this.trCameraRig = GameObject.Find("[CameraRig]").GetComponent<Transform>();
         this.controller = GameObject.FindGameObjectWithTag("Controller").GetComponent<Transform>();
         this.chimeAudio = GetComponent<AudioSource>();
-        this.mapBehavior = GameObject.Find("Map").GetComponent<MapBehavior>();
+        this.mapBehavior = this.goMap.GetComponent<MapBehavior>();
         this.maps = new List<MapDef>();
         // TobiiXR_Settings tobii_settings = new TobiiXR_Settings();
         // tobii_settings.FieldOfUse = FieldOfUse.Analytical;
@@ -118,17 +119,17 @@ public class ExperimentRunner : MonoBehaviour
     }
 
     public int getChimesNeeded(SessionTrial trial) {
-        int chimes_needed = 3 * this.N_CHIMES; // 3 modes, N_CHIMES for each
+        int chimes_needed = this.N_CHIMES; // 3 modes, N_CHIMES for each
         int seconds_from_end = 0;
         if (this.isPlanning()) {
             seconds_from_end = (int)(this.planningSeconds - (Util.timestamp() - trial.ts_planning_start));
             chimes_needed -= seconds_from_end;
         } else if (this.isTransitioning()) {
             seconds_from_end = (int)(this.transitionSeconds - (Util.timestamp() - trial.ts_transition_start));
-            chimes_needed -= this.N_CHIMES + seconds_from_end;
+            chimes_needed += this.N_CHIMES - seconds_from_end;
         } else if (this.isNavigating()) {
-            seconds_from_end = (int)(this.navigationSeconds - (Util.timestamp() - trial.ts_navigation_start));
-            chimes_needed -= this.N_CHIMES + seconds_from_end;
+            seconds_from_end = (int)(Constants.NAVIGATION_SECONDS - (Util.timestamp() - trial.ts_navigation_start));
+            chimes_needed += 2*this.N_CHIMES - seconds_from_end;
         }
         return chimes_needed;
     }
@@ -161,7 +162,7 @@ public class ExperimentRunner : MonoBehaviour
         this.map_order = Util.Shuffle<int>(Enumerable.Range(1, N_MAPS).ToList());
         // Practice maps start at 100
         for (int i=0; i<this.practice_rounds; i++) {
-            this.map_order.Insert(0, 100 + i);
+            this.map_order.Insert(0, 100 + this.practice_rounds - i - 1);
         }
         Debug.Log(map_order.ToString());
     }
@@ -188,7 +189,7 @@ public class ExperimentRunner : MonoBehaviour
         Debug.Log("Running trial " + this.trial_index.ToString());
         this.ui.HideHUDScreen();
         bool first_real = false;
-        int map_index = this.map_order[this.trial_index - this.practice_rounds - 1];
+        int map_index = this.map_order[this.trial_index - 1];
         this.mapBehavior.load(map_index);
         if (this.practicing) {
             if (this.practice_remaining == 0) {
@@ -239,9 +240,20 @@ public class ExperimentRunner : MonoBehaviour
         StartTransitionPhase();
     }
 
+    void SetMapVisibility(bool visible) {
+        // Also agent
+        foreach (Renderer r in this.goMap.GetComponentsInChildren<Renderer>()) {
+            r.enabled = visible;
+        }
+        foreach (Renderer r in this.trAgent.gameObject.GetComponentsInChildren<Renderer>()) {
+            r.enabled = visible;
+        }
+    }
+
     void StartTransitionPhase() {
         Debug.Log("Start transition...");
         this.mode = "transition";
+        this.SetMapVisibility(false);
         this.getCurrentTrial().ts_transition_start = Util.timestamp();
         // TODO: Make everything invisible, but preserve fixation capture
         StartCoroutine(WaitThenNavigate(this.transitionSeconds));
@@ -257,12 +269,12 @@ public class ExperimentRunner : MonoBehaviour
         this.mode = "navigation";        
         this.mapBehavior.setupAgentForNavigation(this.trAgent);
         this.mapBehavior.setupCameraForNavigation();
+        this.SetMapVisibility(true);
         this.mapBehavior.showExistingRewards(this.getCurrentTrial().rewards_present);
         this.getCurrentTrial().ts_navigation_start = Util.timestamp();
         this.chimesPlayed = 0;
-        if (this.navigationSeconds > 0) {
-            StartCoroutine(EndTrialAfterNavigation(this.navigationSeconds, this.current_trial.trial_id));
-            //ui.ShowHUDCountdownMessage(this.navigationSeconds, "Collect gems");
+        if (Constants.NAVIGATION_SECONDS > 0) {
+            StartCoroutine(EndTrialAfterNavigation(Constants.NAVIGATION_SECONDS, this.current_trial.trial_id));
         }
     }
 
@@ -285,7 +297,7 @@ public class ExperimentRunner : MonoBehaviour
         this.current_trial.CleanUpData(); // Deletes large data once saved
         session.AddTrial(this.current_trial);
         this.current_trial = null;
-        if (this.navigationSeconds != -1) {
+        if (Constants.NAVIGATION_SECONDS != -1) {
             // Time limit, clear timer to avoid double GoTo
             CancelInvoke();
         }

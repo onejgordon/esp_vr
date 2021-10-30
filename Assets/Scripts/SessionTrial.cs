@@ -44,6 +44,14 @@ public class SessionTrial
         }
     }
 
+    public bool allRewardsCollected() {
+        return this.reward >= Constants.REWARDS_PER_TRIAL;
+    }
+
+    public double navigationSecondsRemaining() {
+        return (Constants.NAVIGATION_SECONDS - (Util.timestamp() - this.ts_navigation_start));
+    }
+
     public void Finished() {
         this.ts_end = Util.timestamp();
     }
