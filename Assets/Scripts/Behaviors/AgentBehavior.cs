@@ -19,14 +19,17 @@ public class AgentBehavior : MonoBehaviour
     public float turnAngleMax = 40.0f;
     public float turnRate = 0.0f;
     private Renderer _renderer;
-    private Color turningColor = Color.white;
+    private Color turningColor = Color.gray;
+    private Color turningFastColor = Color.white;
     private Color notTurningColor = Color.red;
+    public AudioSource collisionAudio;
 
     void Start()
     {
         this.trControllerIndicator = gameObject.transform.Find("ControllerIndicator").GetComponent<Transform>();
         this._renderer = trControllerIndicator.gameObject.GetComponentInChildren<Renderer>();
         this.velocity = this.baseVelocity;
+        this.collisionAudio = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -77,8 +80,10 @@ public class AgentBehavior : MonoBehaviour
         if (tr != 0.0f) gameObject.transform.Rotate(Vector3.up, tr * rotationSpeed);
         if (rateChange) {
             // Maybe change mat
-            if (tr != 0.0f) this._renderer.material.SetColor("_Color", this.turningColor);
-            else this._renderer.material.SetColor("_Color", this.notTurningColor);
+            if (tr != 0.0f) {
+                Color c = (Mathf.Abs(tr) > 0.5) ? this.turningFastColor : this.turningColor;
+                this._renderer.material.SetColor("_Color", c);
+            } else this._renderer.material.SetColor("_Color", this.notTurningColor);
         }
     }
 
@@ -92,6 +97,7 @@ public class AgentBehavior : MonoBehaviour
     }
 
     public void handleCollision(GameObject collideGameObject) {
+        if (!this.experimentRunner.isNavigating()) return;
         if (collideGameObject.name.Contains("Tile")) {
             // Parent is TileX which may caontain obstacle tag
             collideGameObject = collideGameObject.transform.parent.gameObject;
@@ -99,6 +105,7 @@ public class AgentBehavior : MonoBehaviour
         // Debug.Log("Collided with " + collideGameObject.name + " with tag: " + collideGameObject.tag);
         if (collideGameObject.CompareTag("obstacle")) {
             Debug.Log("Hit obstacle");
+            this.collisionAudio.Play();
             experimentRunner.EndTrial();
         } else if (collideGameObject.CompareTag("tile")) {
             TileBehavior tb = collideGameObject.GetComponent<TileBehavior>();

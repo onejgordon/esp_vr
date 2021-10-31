@@ -39,7 +39,7 @@ public class RewardBehavior : MonoBehaviour
             // Only consume present rewards
             SessionTrial st = experimentRunner.getCurrentTrial();
             goCylinder.SetActive(false);
-            st.reward += 1;
+            st.rewardCollected(this.id);
             this.rewardAudio.Play();
             Debug.Log("Consumed reward, new trial score: " + st.reward.ToString());
         }

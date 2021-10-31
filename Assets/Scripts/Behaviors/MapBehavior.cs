@@ -7,6 +7,7 @@ using Valve.VR;
 public class MapBehavior : MonoBehaviour
 {
     public MapDef map;
+    public int map_index;
     public BaseMapDef baseMapDef;
     public bool baseMapLoaded = false;
     private List<GameObject> tiles; 
@@ -49,6 +50,7 @@ public class MapBehavior : MonoBehaviour
                 this.baseMapDef.init();
                 this.baseMapLoaded = true;
             }
+            this.map_index = map_num;
             this.initialize(0.5f);
         } else Debug.Log(string.Format("{0} doesn't exist", path));
     }

@@ -34,7 +34,9 @@ public class ExperimentRunner : MonoBehaviour
     private bool recording = false;
     private bool practicing = false;
     private int chimesPlayed = 0;
-    private string mode = "planning";
+    private string mode = "start";
+    private double ts_next_chime_check = 0;
+    private double ts_next_record = 0;
 
     // Session specs
     private string session_id;
@@ -71,6 +73,7 @@ public class ExperimentRunner : MonoBehaviour
         } else {
             this.session_id = ((int)Util.timestamp()).ToString();
         }
+        if (practice_rounds > 0) this.practicing = true;
         this.session.data.session_id = this.session_id;
         this.session.data.left_handed = this.left_handed;
         this.practice_remaining = this.practice_rounds;
@@ -90,45 +93,53 @@ public class ExperimentRunner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        double ts = Util.timestamp();
         if (recording && this.current_trial != null) {
-            Vector3 gazeOrigin = new Vector3();
-            Vector3 gazeDirection = new Vector3();
-            float convDistance = -1.0f; // Default when not valid
-            bool eitherEyeClosed = false;
-            var eyeTrackingData = TobiiXR.GetEyeTrackingData(TobiiXR_TrackingSpace.World);
-            if (eyeTrackingData.GazeRay.IsValid) {
-                gazeOrigin = eyeTrackingData.GazeRay.Origin;
-                gazeDirection = eyeTrackingData.GazeRay.Direction;
+            if (ts > ts_next_record) {
+                Vector3 gazeOrigin = new Vector3();
+                Vector3 gazeDirection = new Vector3();
+                float convDistance = -1.0f; // Default when not valid
+                bool eitherEyeClosed = false;
+                var eyeTrackingData = TobiiXR.GetEyeTrackingData(TobiiXR_TrackingSpace.World);
+                if (eyeTrackingData.GazeRay.IsValid) {
+                    gazeOrigin = eyeTrackingData.GazeRay.Origin;
+                    gazeDirection = eyeTrackingData.GazeRay.Direction;
+                }
+                eitherEyeClosed = eyeTrackingData.IsLeftEyeBlinking || eyeTrackingData.IsRightEyeBlinking;
+                if (eyeTrackingData.ConvergenceDistanceIsValid) {
+                    convDistance = eyeTrackingData.ConvergenceDistance;
+                }
+                Record record = new Record(
+                    this.modeChar(),  // First letter of mode in [p, t, n]
+                    this.trAgent,
+                    trCameraRig,
+                    controller,
+                    gazeOrigin,
+                    gazeDirection,
+                    convDistance,
+                    eitherEyeClosed);
+                this.current_trial.addRecord(record);
+                ts_next_record = ts + 0.25;  // 4hz?
             }
-            eitherEyeClosed = eyeTrackingData.IsLeftEyeBlinking || eyeTrackingData.IsRightEyeBlinking;
-            if (eyeTrackingData.ConvergenceDistanceIsValid) {
-                convDistance = eyeTrackingData.ConvergenceDistance;
-            }
-            Record record = new Record(
-                this.mode[0].ToString(),  // First letter of mode in [p, t, n]
-                this.trAgent,
-                trCameraRig,
-                controller,
-                gazeOrigin,
-                gazeDirection,
-                convDistance,
-                eitherEyeClosed);
-            this.current_trial.addRecord(record);
         }
-        this.maybePlayChimes();
+        if (ts > ts_next_chime_check) {
+            this.maybePlayChimes();
+            ts_next_chime_check = ts + 0.5;  // 2hz
+        }
     }
 
     public int getChimesNeeded(SessionTrial trial) {
-        int chimes_needed = this.N_CHIMES; // 3 modes, N_CHIMES for each
+        int chimes_needed = 0;
         int seconds_from_end = 0;
+        double ts = Util.timestamp();
         if (this.isPlanning()) {
-            seconds_from_end = (int)(this.planningSeconds - (Util.timestamp() - trial.ts_planning_start));
-            chimes_needed -= seconds_from_end;
-        } else if (this.isTransitioning()) {
-            seconds_from_end = (int)(this.transitionSeconds - (Util.timestamp() - trial.ts_transition_start));
+            seconds_from_end = (int)(this.planningSeconds - (ts - trial.ts_planning_start));
             chimes_needed += this.N_CHIMES - seconds_from_end;
+        } else if (this.isTransitioning()) {
+            // seconds_from_end = (int)(this.transitionSeconds - (ts - trial.ts_transition_start));
+            // chimes_needed += 2*this.N_CHIMES - seconds_from_end;
         } else if (this.isNavigating()) {
-            seconds_from_end = (int)(Constants.NAVIGATION_SECONDS - (Util.timestamp() - trial.ts_navigation_start));
+            seconds_from_end = (int)(Constants.NAVIGATION_SECONDS - (ts - trial.ts_navigation_start));
             chimes_needed += 2*this.N_CHIMES - seconds_from_end;
         }
         return chimes_needed;
@@ -136,13 +147,19 @@ public class ExperimentRunner : MonoBehaviour
     public void maybePlayChimes() {
         SessionTrial trial = this.getCurrentTrial();
         if (trial != null) {
-            if (this.getChimesNeeded(trial) > chimesPlayed) {
+            int needed = this.getChimesNeeded(trial);
+            if (needed > chimesPlayed) {
                 // Play chime
                 this.chimeAudio.Play();
+                Debug.LogFormat("Playing chime {0} of {1}", this.chimesPlayed, needed);
                 this.chimesPlayed += 1;
             }
 
         }
+    }
+
+    public string modeChar() {
+        return this.mode[0].ToString();
     }
 
     public bool isNavigating() {
@@ -186,11 +203,12 @@ public class ExperimentRunner : MonoBehaviour
     }
 
     void RunOneTrial() {
-        Debug.Log("Running trial " + this.trial_index.ToString());
         this.ui.HideHUDScreen();
         bool first_real = false;
         int map_index = this.map_order[this.trial_index - 1];
+        Debug.LogFormat("Running trial {0}, map {1}, practicing: {2}", this.trial_index, map_index, this.practicing);
         this.mapBehavior.load(map_index);
+        this.SetMapVisibility(false);
         if (this.practicing) {
             if (this.practice_remaining == 0) {
                 this.practicing = false;
@@ -199,7 +217,8 @@ public class ExperimentRunner : MonoBehaviour
                 this.practice_remaining -= 1;
             }
         }
-        this.current_trial = new SessionTrial(this.session_id, this.trial_index, this.mapBehavior.map, this.practicing);
+        
+        this.current_trial = new SessionTrial(this.session_id, this.trial_index, this.mapBehavior.map, this.mapBehavior.map_index, this.practicing);
         if (this.practicing) {
             ui.ShowHUDScreenWithConfirm(
                 string.Format(
@@ -226,6 +245,7 @@ public class ExperimentRunner : MonoBehaviour
     void StartPlanningPhase() {
         Debug.Log("Start planning...");
         this.mode = "planning";
+        this.SetMapVisibility(true);
         this.trAgent.gameObject.SetActive(true);
         this.mapBehavior.setupCameraForPlanning(this.trCameraRig);
         this.mapBehavior.setupAgentForPlanning(this.trAgent);

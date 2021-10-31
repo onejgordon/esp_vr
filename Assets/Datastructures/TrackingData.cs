@@ -6,13 +6,14 @@ using System.IO;
 
 [System.Serializable]
 public class Fixation {
-
+    public string mode;
     public string objectName;
     public double start_ts;
     public double stop_ts;
     public double duration;
 
-    public Fixation(string objectName, double start_ts, double stop_ts) {
+    public Fixation(string modeChar, string objectName, double start_ts, double stop_ts) {
+        this.mode = modeChar;
         this.objectName = objectName;
         this.duration = stop_ts - start_ts;
         this.start_ts = start_ts;

@@ -21,18 +21,22 @@ public class SessionTrial
     public List<string> rewards_present;
     public List<Fixation> fixations;
     public List<Record> records;
+    public List<string> rewards_collected;
 
     public MapDef map;
+    public int map_index;
 
-    public SessionTrial(string session_id, int id, MapDef map, bool practice) {
+    public SessionTrial(string session_id, int id, MapDef map, int map_index, bool practice) {
         this.session_id = session_id;
         this.map = map;
+        this.map_index = map_index;
         this.trial_id = id;
         this.reward = 0;
         this.rewards_present = new List<string>();
         this.practice = practice;
         this.fixations = new List<Fixation>();
         this.records = new List<Record>();
+        this.rewards_collected = new List<string>();
         this.randomizeRewardPresence();
     }
 
@@ -46,6 +50,11 @@ public class SessionTrial
 
     public bool allRewardsCollected() {
         return this.reward >= Constants.REWARDS_PER_TRIAL;
+    }
+
+    public void rewardCollected(string id) {
+        this.reward += 1;
+        this.rewards_collected.Add(id);
     }
 
     public double navigationSecondsRemaining() {
@@ -82,8 +91,8 @@ public class SessionTrial
         return true;
     }
 
-    public bool addFixation(string objectName, double start, double stop) {
-        this.fixations.Add(new Fixation(objectName, start, stop));
+    public bool addFixation(string modeChar, string objectName, double start, double stop) {
+        this.fixations.Add(new Fixation(modeChar, objectName, start, stop));
         return true;
     }
 }
