@@ -22,6 +22,7 @@ public class ExperimentRunner : MonoBehaviour
     public bool QUICK_DEBUG = true;
     public int N_TRIALS = 10; // Set to 0 for production. Just for short debug data collection
     public int N_MAPS = 20;
+    public int N_MANUAL_MAPS = 3;
     public int practice_rounds = 2;
     public bool left_handed = false;
     public bool record = false;
@@ -181,7 +182,9 @@ public class ExperimentRunner : MonoBehaviour
         for (int i=0; i<this.practice_rounds; i++) {
             this.map_order.Insert(0, 100 + this.practice_rounds - i - 1);
         }
-        Debug.Log(map_order.ToString());
+        // Add manual maps at end (they start at 200)
+        this.map_order.Add(Enumerable.Range(200, 200 + N_MANUAL_MAPS - 1));
+        Debug.Log(string.Join(", ", map_order));
     }
 
     public void BeginExperiment() {
