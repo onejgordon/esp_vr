@@ -7,6 +7,7 @@ using Valve.VR;
 public class MapBehavior : MonoBehaviour
 {
     public MapDef map;
+    public int map_index;
     public BaseMapDef baseMapDef;
     public bool baseMapLoaded = false;
     private List<GameObject> tiles; 
@@ -49,6 +50,7 @@ public class MapBehavior : MonoBehaviour
                 this.baseMapDef.init();
                 this.baseMapLoaded = true;
             }
+            this.map_index = map_num;
             this.initialize(0.5f);
         } else Debug.Log(string.Format("{0} doesn't exist", path));
     }
@@ -143,6 +145,8 @@ public class MapBehavior : MonoBehaviour
             goNewTile.transform.GetChild(1).gameObject.AddComponent<MyHighlightAtGaze>();
             goNewTile.transform.GetChild(2).gameObject.AddComponent<MyHighlightAtGaze>();
         }
+        goNewTile.transform.GetChild(1).gameObject.AddComponent<LookHandler>();
+        goNewTile.transform.GetChild(2).gameObject.AddComponent<LookHandler>();
         this.tiles.Add(goNewTile);
         return trNewTile;
     }
@@ -153,6 +157,8 @@ public class MapBehavior : MonoBehaviour
         GameObject goReward = Instantiate(this.prReward, pos, Quaternion.identity, gameObject.transform);
         Transform trReward = goReward.transform;
         RewardBehavior rb = goReward.GetComponent<RewardBehavior>();
+        GameObject cyl = goReward.transform.GetChild(0).gameObject;
+        cyl.AddComponent<LookHandler>();
         rb.setup(at_tile_id);
         trReward.name = "Reward" + at_tile_id;
         this.rewards.Add(goReward);
