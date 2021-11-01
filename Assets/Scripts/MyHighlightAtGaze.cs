@@ -22,7 +22,6 @@ public class MyHighlightAtGaze : MonoBehaviour, IGazeFocusable
         if (hasFocus)
         {
             _targetColor = highlightColor;
-            Debug.Log("Got gaze on " + gameObject.name);
         }
         //If this object lost focus, fade the object's color to it's original color
         else
