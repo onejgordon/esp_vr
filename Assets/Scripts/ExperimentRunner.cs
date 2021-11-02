@@ -95,7 +95,7 @@ public class ExperimentRunner : MonoBehaviour
     void Update()
     {
         double ts = Util.timestamp();
-        if (recording && this.current_trial != null) {
+        if (recording && this.current_trial != null && this.recordingMode()) {
             if (ts > ts_next_record) {
                 Vector3 gazeOrigin = new Vector3();
                 Vector3 gazeDirection = new Vector3();
@@ -129,6 +129,10 @@ public class ExperimentRunner : MonoBehaviour
         }
     }
 
+    public bool recordingMode() {
+        return this.mode != "ended";
+    }
+
     public int getChimesNeeded(SessionTrial trial) {
         int chimes_needed = 0;
         int seconds_from_end = 0;
@@ -152,7 +156,7 @@ public class ExperimentRunner : MonoBehaviour
             if (needed > chimesPlayed) {
                 // Play chime
                 this.chimeAudio.Play();
-                Debug.LogFormat("Playing chime {0} of {1}", this.chimesPlayed, needed);
+                // Debug.LogFormat("Playing chime {0} of {1}", this.chimesPlayed, needed);
                 this.chimesPlayed += 1;
             }
 
@@ -183,7 +187,7 @@ public class ExperimentRunner : MonoBehaviour
             this.map_order.Insert(0, 100 + this.practice_rounds - i - 1);
         }
         // Add manual maps at end (they start at 200)
-        this.map_order.Add(Enumerable.Range(200, 200 + N_MANUAL_MAPS - 1));
+        this.map_order.AddRange(Enumerable.Range(200, N_MANUAL_MAPS));
         Debug.Log(string.Join(", ", map_order));
     }
 

@@ -7,7 +7,6 @@ using Tobii.XR;
 public class LookHandler : MonoBehaviour, IGazeFocusable 
 {
     private ExperimentRunner exp;
-    public bool recordDetailedHits = false;
     bool gazedAt = false;
     double last_gaze_start_ts = 0.0f;
     private string name;
@@ -18,28 +17,18 @@ public class LookHandler : MonoBehaviour, IGazeFocusable
     }
     void Update()
     {
-        if (gazedAt && this.recordDetailedHits) {
-            // Get eye tracking data in world space
-            var eyeTrackingData = TobiiXR.GetEyeTrackingData(TobiiXR_TrackingSpace.World);
-            
-            // Check if gaze ray is valid
-            if (eyeTrackingData.GazeRay.IsValid) {
-                // The origin of the gaze ray is a 3D point
-                var rayOrigin = eyeTrackingData.GazeRay.Origin;
-                // The direction of the gaze ray is a normalized direction vector
-                var rayDirection = eyeTrackingData.GazeRay.Direction;
-            }   
-        }
+
     }
 
     private string objectName() {
-        string name = gameObject.name;
-        if (gameObject.CompareTag("tile")) {
-            name = gameObject.transform.parent.gameObject.name;
+        string oname = gameObject.name;
+        GameObject parent = gameObject.transform.parent.gameObject;
+        if (parent.CompareTag("tile")) {
+            oname = parent.name;
         } else if (gameObject.CompareTag("reward")) {
-            name = gameObject.transform.parent.gameObject.name;
+            oname = parent.name;
         }
-        return name;
+        return oname;
     }
 
     public void GazeFocusChanged(bool focused) {

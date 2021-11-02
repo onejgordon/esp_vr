@@ -10,7 +10,6 @@ public class SessionTrial
     private string session_id; // Unique id for each subject/session
     public int trial_id;
     public int reward = 0;
-    public float reward_uncertainty;
     public double ts_planning_start;
     public double ts_transition_start;
     public double ts_navigation_start;

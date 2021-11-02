@@ -11,11 +11,9 @@ public class MapBehavior : MonoBehaviour
     public BaseMapDef baseMapDef;
     public bool baseMapLoaded = false;
     private List<GameObject> tiles; 
-    //private List<GameObject> walls;
     private List<GameObject> rewards; 
 
     // Prefabs
-    //public GameObject prWall;
     public GameObject prTile;
     public GameObject prReward;
     public Transform trSceneLight;
@@ -111,7 +109,7 @@ public class MapBehavior : MonoBehaviour
     }
 
     public void setupAgentForNavigation(Transform trAgent) {
-        // trAgent.position = new Vector3(this.baseMapDef.start[0], 2.0f, this.baseMapDef.start[1] + 3*trAgent.localScale.z);
+        trAgent.position = new Vector3(this.baseMapDef.start[0], 1.0f, this.baseMapDef.start[1] + 3*trAgent.localScale.z);
     }
 
 
