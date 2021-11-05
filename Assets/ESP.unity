@@ -124,6 +124,42 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!21 &43307449
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Sprites/Default
+  m_Shader: {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _AlphaTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - PixelSnap: 0
+    - _EnableExternalAlpha: 0
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Flip: {r: 1, g: 1, b: 1, a: 1}
+    - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []
 --- !u!1 &181307797
 GameObject:
   m_ObjectHideFlags: 0
@@ -246,7 +282,160 @@ MonoBehaviour:
   screenBG: {fileID: 811730593}
   uiImage: {fileID: 2075411011}
   experimentRunner: {fileID: 571417336}
---- !u!43 &196207454
+--- !u!1 &281794342
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 281794343}
+  m_Layer: 0
+  m_Name: HUD
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &281794343
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 281794342}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1327.4781, y: 9497.864, z: -208.5356}
+  m_LocalScale: {x: 363.73068, y: 363.73068, z: 363.73068}
+  m_Children:
+  - {fileID: 702099328}
+  m_Father: {fileID: 181307801}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &285935540
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 285935541}
+  - component: {fileID: 285935542}
+  m_Layer: 0
+  m_Name: Map
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &285935541
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 285935540}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 571417337}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &285935542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 285935540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2209a0876856d467db3c0d6abc9cf390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  map:
+    side: 10
+    tile_types: 
+    base_map: 
+    reward_slot_ids: []
+  map_index: 0
+  baseMapDef:
+    points: []
+    tiles: []
+    center: []
+    start: []
+  baseMapLoaded: 0
+  prTile: {fileID: 3076895990533114452, guid: 62df3a520ac0d4776832aa6afc907171, type: 3}
+  prReward: {fileID: 853260708297306885, guid: a2416e9cb5be09d4884272dbde056ca8, type: 3}
+  trSceneLight: {fileID: 1873960350}
+  sceneCamera: {fileID: 1609330038}
+  rigFollow: {fileID: 2058467914}
+  highlightGaze: 0
+--- !u!1 &288193468
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 288193470}
+  - component: {fileID: 288193469}
+  m_Layer: 0
+  m_Name: TobiiXR_Initializer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &288193469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 288193468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 323f6169a2404ef4293c9be9671a1803, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Settings:
+    EyeTrackingFilter: {fileID: 0}
+    StandaloneEyeTrackingProviders:
+    - TypeName: HTCProvider
+    - TypeName: Tobii.XR.TobiiProvider
+    AndroidEyeTrackingProviders:
+    - TypeName: Tobii.XR.TobiiProvider
+    - TypeName: Tobii.XR.PicoXRProvider
+    - TypeName: Tobii.XR.NoseDirectionProvider
+    - TypeName: Tobii.XR.MouseProvider
+    LayerMask:
+      serializedVersion: 2
+      m_Bits: 2147483647
+    HowLongToKeepCandidatesInSeconds: 1
+    AdvancedEnabled: 0
+    OcumenLicense: 
+    PopupLicenseValidationErrors: 0
+    LicenseAsset: {fileID: 0}
+--- !u!4 &288193470
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 288193468}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.089925356, y: -0.0038684066, z: -6.3088255}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!43 &404168212
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -410,159 +599,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!1 &281794342
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 281794343}
-  m_Layer: 0
-  m_Name: HUD
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &281794343
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 281794342}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1327.4781, y: 9497.864, z: -208.5356}
-  m_LocalScale: {x: 363.73068, y: 363.73068, z: 363.73068}
-  m_Children:
-  - {fileID: 702099328}
-  m_Father: {fileID: 181307801}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &285935540
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 285935541}
-  - component: {fileID: 285935542}
-  m_Layer: 0
-  m_Name: Map
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &285935541
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 285935540}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 571417337}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &285935542
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 285935540}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2209a0876856d467db3c0d6abc9cf390, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  map:
-    side: 10
-    tile_types: 
-    base_map: 
-    reward_slot_ids: []
-  map_index: 0
-  baseMapDef:
-    points: []
-    tiles: []
-    center: []
-    start: []
-  baseMapLoaded: 0
-  prTile: {fileID: 3076895990533114452, guid: 62df3a520ac0d4776832aa6afc907171, type: 3}
-  prReward: {fileID: 853260708297306885, guid: a2416e9cb5be09d4884272dbde056ca8, type: 3}
-  trSceneLight: {fileID: 1873960350}
-  sceneCamera: {fileID: 1609330038}
-  rigFollow: {fileID: 2058467914}
-  highlightGaze: 1
---- !u!1 &288193468
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 288193470}
-  - component: {fileID: 288193469}
-  m_Layer: 0
-  m_Name: TobiiXR_Initializer
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &288193469
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 288193468}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 323f6169a2404ef4293c9be9671a1803, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Settings:
-    EyeTrackingFilter: {fileID: 0}
-    StandaloneEyeTrackingProviders:
-    - TypeName: HTCProvider
-    - TypeName: Tobii.XR.TobiiProvider
-    AndroidEyeTrackingProviders:
-    - TypeName: Tobii.XR.TobiiProvider
-    - TypeName: Tobii.XR.PicoXRProvider
-    - TypeName: Tobii.XR.NoseDirectionProvider
-    - TypeName: Tobii.XR.MouseProvider
-    LayerMask:
-      serializedVersion: 2
-      m_Bits: 4294967295
-    HowLongToKeepCandidatesInSeconds: 1
-    AdvancedEnabled: 0
-    OcumenLicense: 
-    PopupLicenseValidationErrors: 0
-    LicenseAsset: {fileID: 0}
---- !u!4 &288193470
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 288193468}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.089925356, y: -0.0038684066, z: -6.3088255}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &571417335
 GameObject:
   m_ObjectHideFlags: 0
@@ -605,7 +641,7 @@ MonoBehaviour:
   N_MANUAL_MAPS: 3
   practice_rounds: 2
   left_handed: 0
-  record: 1
+  record: 0
   trAgent: {fileID: 775975277}
   trSceneLight: {fileID: 1873960350}
   sceneCamera: {fileID: 0}
@@ -745,42 +781,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!21 &608771925
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Sprites/Default
-  m_Shader: {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _AlphaTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - PixelSnap: 0
-    - _EnableExternalAlpha: 0
-    m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _Flip: {r: 1, g: 1, b: 1, a: 1}
-    - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
-  m_BuildTextureStacks: []
 --- !u!1 &702099325
 GameObject:
   m_ObjectHideFlags: 0
@@ -1007,11 +1007,11 @@ PrefabInstance:
     - target: {fileID: 2348914, guid: 4d293c8e162f3874b982baadd71153d2, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 608771925}
+      objectReference: {fileID: 43307449}
     - target: {fileID: 3380982, guid: 4d293c8e162f3874b982baadd71153d2, type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: 196207454}
+      objectReference: {fileID: 404168212}
     - target: {fileID: 20000014031267948, guid: 4d293c8e162f3874b982baadd71153d2,
         type: 3}
       propertyPath: m_BackGroundColor.b
