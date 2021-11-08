@@ -400,7 +400,7 @@ public class PolyExtruder : MonoBehaviour
 			*/
 
             // note: for 3D prism, only keep top mesh collider activated (adapt to own preferences this if needed)
-            // ESP needs surround collisions, so enabled that too.
+            // JG: ESP needs surround collisions, so enabled that too.
             goB.GetComponent<MeshCollider>().enabled = false;
             goT.GetComponent<MeshCollider>().enabled = true;
             goS.GetComponent<MeshCollider>().enabled = true;

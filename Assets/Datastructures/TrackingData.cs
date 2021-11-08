@@ -28,18 +28,18 @@ public class Record {
     public float ag_x;
     public float ag_y;
     public float ag_z;
-    public float ag_yaw;
-    public float ag_roll;
-    public float ag_pitch;
-    public float hmd_yaw;
-    public float hmd_roll;
-    public float hmd_pitch;
+    public float ag_rot_x;
+    public float ag_rot_y;
+    public float ag_rot_z;
+    public float hmd_rot_x;
+    public float hmd_rot_y;
+    public float hmd_rot_z;
     public float hmd_x;
     public float hmd_y;
     public float hmd_z;
-    public float ctr_yaw;
-    public float ctr_roll;
-    public float ctr_pitch;
+    public float ctr_rot_x;
+    public float ctr_rot_y;
+    public float ctr_rot_z;
     public float ctr_x;
     public float ctr_y;
     public float ctr_z;
@@ -60,38 +60,31 @@ public class Record {
 
     public Record(string mode, Transform trAgent, Transform trHMD, Transform trController, Vector3 gaze_origin, Vector3 gaze_direction, float convDistance, bool blinking) {
         this.ts = Util.timestamp();
-        this.mode = mode;
-        this.ag_x = trAgent.position.x;
-        this.ag_y = trAgent.position.y;
-        this.ag_z = trAgent.position.z;
-        Quaternion ag_rot = trAgent.rotation;
-        this.ag_roll  = Mathf.Atan2(2*ag_rot.y*ag_rot.w + 2*ag_rot.x*ag_rot.z, 1 - 2*ag_rot.y*ag_rot.y - 2*ag_rot.z*ag_rot.z);
-        this.ag_pitch = Mathf.Atan2(2*ag_rot.x*ag_rot.w + 2*ag_rot.y*ag_rot.z, 1 - 2*ag_rot.x*ag_rot.x - 2*ag_rot.z*ag_rot.z);
-        this.ag_yaw   =  Mathf.Asin(2*ag_rot.x*ag_rot.y + 2*ag_rot.z*ag_rot.w);
-        Quaternion hmd_rot = trHMD.rotation;
-        Quaternion ctr_rot = trController.rotation;
         Vector3 hmd_pos = trHMD.position;
         Vector3 ctr_pos = trController.position;
-        float hmd_rot_x = hmd_rot.x;
-        float hmd_rot_y = hmd_rot.y;
-        float hmd_rot_z = hmd_rot.z;
-        float hmd_rot_w = hmd_rot.w;
-        this.hmd_roll  = Mathf.Atan2(2*hmd_rot_y*hmd_rot_w + 2*hmd_rot_x*hmd_rot_z, 1 - 2*hmd_rot_y*hmd_rot_y - 2*hmd_rot_z*hmd_rot_z);
-        this.hmd_pitch = Mathf.Atan2(2*hmd_rot_x*hmd_rot_w + 2*hmd_rot_y*hmd_rot_z, 1 - 2*hmd_rot_x*hmd_rot_x - 2*hmd_rot_z*hmd_rot_z);
-        this.hmd_yaw   =  Mathf.Asin(2*hmd_rot_x*hmd_rot_y + 2*hmd_rot_z*hmd_rot_w);
+        Vector3 ag_pos = trAgent.position;
+
+        this.mode = mode;
+        this.ag_x = ag_pos.x;
+        this.ag_y = ag_pos.y;
+        this.ag_z = ag_pos.z;
         this.hmd_x = hmd_pos.x;
         this.hmd_y = hmd_pos.y;
         this.hmd_z = hmd_pos.z;
-        float ctr_rot_x = ctr_rot.x;
-        float ctr_rot_y = ctr_rot.y;
-        float ctr_rot_z = ctr_rot.z;
-        float ctr_rot_w = ctr_rot.w;
-        this.ctr_roll  = Mathf.Atan2(2*ctr_rot_y*ctr_rot_w + 2*ctr_rot_x*ctr_rot_z, 1 - 2*ctr_rot_y*ctr_rot_y - 2*ctr_rot_z*ctr_rot_z);
-        this.ctr_pitch = Mathf.Atan2(2*ctr_rot_x*ctr_rot_w + 2*ctr_rot_y*ctr_rot_z, 1 - 2*ctr_rot_x*ctr_rot_x - 2*ctr_rot_z*ctr_rot_z);
-        this.ctr_yaw   =  Mathf.Asin(2*ctr_rot_x*ctr_rot_y + 2*ctr_rot_z*ctr_rot_w);
         this.ctr_x = ctr_pos.x;
         this.ctr_y = ctr_pos.y;
         this.ctr_z = ctr_pos.z;
+
+        this.ag_rot_x = trAgent.localEulerAngles.x;
+        this.ag_rot_y = trAgent.localEulerAngles.y;
+        this.ag_rot_z = trAgent.localEulerAngles.z;
+        this.hmd_rot_x = trHMD.localEulerAngles.x;
+        this.hmd_rot_y = trHMD.localEulerAngles.y;
+        this.hmd_rot_z = trHMD.localEulerAngles.z;
+        this.ctr_rot_x = trController.localEulerAngles.x;
+        this.ctr_rot_y = trController.localEulerAngles.y;
+        this.ctr_rot_z = trController.localEulerAngles.z;
+
         if (gaze_origin != null) {
             this.gaze_or_x = gaze_origin.x;
             this.gaze_or_y = gaze_origin.y;

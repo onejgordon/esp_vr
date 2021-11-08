@@ -120,7 +120,7 @@ public class ExperimentRunner : MonoBehaviour
                     convDistance,
                     eitherEyeClosed);
                 this.current_trial.addRecord(record);
-                ts_next_record = ts + 0.25;  // 4hz?
+                ts_next_record = ts + 0.1;  // 10hz?
             }
         }
         if (ts > ts_next_chime_check) {
