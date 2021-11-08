@@ -40,7 +40,7 @@ public class LookHandler : MonoBehaviour, IGazeFocusable
         } else {
             // Stop gaze timer and record fixation
             if (this.last_gaze_start_ts > 0.0f) {
-                Debug.Log(">> Adding fixation on " + this.name);
+                // Debug.Log(">> Adding fixation on " + this.name);
                 SessionTrial trial = exp.getCurrentTrial();
                 if (trial != null) trial.addFixation(this.exp.modeChar(), this.name, this.last_gaze_start_ts, Util.timestamp());
                 this.last_gaze_start_ts = 0.0f;

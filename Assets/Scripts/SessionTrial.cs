@@ -65,6 +65,7 @@ public class SessionTrial
     }
 
     public void SaveToFile() {
+        if (this.fixations.Count == 0) Debug.Log("WARNING: No fixations recorded for trial...");
         string json = JsonUtility.ToJson(this);
         string path = this.outfile();
         StreamWriter sw = File.CreateText(path);

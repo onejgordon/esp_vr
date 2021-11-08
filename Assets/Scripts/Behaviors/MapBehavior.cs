@@ -21,6 +21,8 @@ public class MapBehavior : MonoBehaviour
     public CameraFollowBehavior rigFollow;
     public bool highlightGaze;
 
+    private Quaternion agentInitQuat = Quaternion.Euler(0, 30, 0);
+
 
     void Start()
     {
@@ -98,9 +100,13 @@ public class MapBehavior : MonoBehaviour
         this.sceneCamera.orthographic = true;
     }
 
+    private Vector3 initAgentPosition(Transform trAgent) {
+        return new Vector3(this.baseMapDef.start[0], 1.0f, this.baseMapDef.start[1]) + 3*trAgent.localScale.z * trAgent.forward;
+    }
+
     public void setupAgentForPlanning(Transform trAgent) {
-        trAgent.rotation = Quaternion.Euler(0, 30, 0);
-        trAgent.position = new Vector3(this.baseMapDef.start[0], 3.0f, this.baseMapDef.start[1]) + 3*trAgent.localScale.z * trAgent.forward;
+        trAgent.rotation = this.agentInitQuat;
+        trAgent.position = this.initAgentPosition(trAgent);
         this.sceneCamera.orthographic = false;
     }
 
@@ -109,7 +115,8 @@ public class MapBehavior : MonoBehaviour
     }
 
     public void setupAgentForNavigation(Transform trAgent) {
-        trAgent.position = new Vector3(this.baseMapDef.start[0], 1.0f, this.baseMapDef.start[1] + 3*trAgent.localScale.z);
+        trAgent.rotation = this.agentInitQuat;
+        trAgent.position = this.initAgentPosition(trAgent);
     }
 
 
