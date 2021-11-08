@@ -10,7 +10,6 @@ public class SessionTrial
     private string session_id; // Unique id for each subject/session
     public int trial_id;
     public int reward = 0;
-    public float reward_uncertainty;
     public double ts_planning_start;
     public double ts_transition_start;
     public double ts_navigation_start;
@@ -66,6 +65,7 @@ public class SessionTrial
     }
 
     public void SaveToFile() {
+        if (this.fixations.Count == 0) Debug.Log("WARNING: No fixations recorded for trial...");
         string json = JsonUtility.ToJson(this);
         string path = this.outfile();
         StreamWriter sw = File.CreateText(path);

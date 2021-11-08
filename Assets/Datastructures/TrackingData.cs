@@ -10,12 +10,10 @@ public class Fixation {
     public string objectName;
     public double start_ts;
     public double stop_ts;
-    public double duration;
 
     public Fixation(string modeChar, string objectName, double start_ts, double stop_ts) {
         this.mode = modeChar;
         this.objectName = objectName;
-        this.duration = stop_ts - start_ts;
         this.start_ts = start_ts;
         this.stop_ts = stop_ts;
     }

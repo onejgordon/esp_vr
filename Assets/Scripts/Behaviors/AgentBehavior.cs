@@ -117,9 +117,9 @@ public class AgentBehavior : MonoBehaviour
             rb.consume();
             SessionTrial trial = this.experimentRunner.getCurrentTrial();
             if (trial.allRewardsCollected()) {
-                if (trial.navigationSecondsRemaining() > 5.0f) {
+                if (trial.navigationSecondsRemaining() > 3.0f) {
                     // If enough time remaining, schedule premature end
-                    StartCoroutine(WaitThenEnd(3));
+                    StartCoroutine(WaitThenEnd(2));
                 }
             }
         }
