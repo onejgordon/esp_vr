@@ -23,7 +23,7 @@ public class LookHandler : MonoBehaviour, IGazeFocusable
     private string objectName() {
         string oname = gameObject.name;
         GameObject parent = gameObject.transform.parent.gameObject;
-        if (parent.CompareTag("tile")) {
+        if (parent.CompareTag("tile") || parent.CompareTag("obstacle")) {
             oname = parent.name;
         } else if (gameObject.CompareTag("reward")) {
             oname = parent.name;
