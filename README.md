@@ -46,3 +46,4 @@ Tobii.XR.StreamEngineTracker:ProcessCallback (intptr,System.Diagnostics.Stopwatc
 Tobii.XR.StreamEngineTracker:ProcessLoop () (at C:/Users/VR_Research_1/Documents/TobiiXRSDK_3.0.1.179/Runtime/Core/Providers/Tobii/StreamEngineTracker.cs:158)
 System.Threading.ThreadHelper:ThreadStart ()
 
+3. "Failed to connect to tracker" with a reference to TobiiProvider:InitializeWithLicense
