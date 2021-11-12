@@ -101,7 +101,7 @@ public class MapBehavior : MonoBehaviour
     }
 
     private Vector3 initAgentPosition(Transform trAgent) {
-        return new Vector3(this.baseMapDef.start[0], 1.0f, this.baseMapDef.start[1]) + 3*trAgent.localScale.z * trAgent.forward;
+        return new Vector3(this.baseMapDef.start[0], 1.0f, this.baseMapDef.start[1]) + 1.5f*trAgent.localScale.z * trAgent.forward;
     }
 
     public void setupAgentForPlanning(Transform trAgent) {
