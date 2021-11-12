@@ -250,7 +250,7 @@ public class ExperimentRunner : MonoBehaviour
     }
 
     void StartPlanningPhase() {
-        Debug.Log("Start planning...");
+        // Debug.Log("Start planning...");
         this.mode = "planning";
         this.SetMapVisibility(true);
         this.trAgent.gameObject.SetActive(true);
@@ -278,7 +278,7 @@ public class ExperimentRunner : MonoBehaviour
     }
 
     void StartTransitionPhase() {
-        Debug.Log("Start transition...");
+        // Debug.Log("Start transition...");
         this.mode = "transition";
         this.SetMapVisibility(false);
         this.getCurrentTrial().ts_transition_start = Util.timestamp();
@@ -292,7 +292,7 @@ public class ExperimentRunner : MonoBehaviour
     }
 
     void StartNavigationPhase() {
-        Debug.Log("Start navigation...");
+        // Debug.Log("Start navigation...");
         this.mode = "navigation";        
         this.mapBehavior.setupAgentForNavigation(this.trAgent);
         this.mapBehavior.setupCameraForNavigation();
@@ -336,6 +336,19 @@ public class ExperimentRunner : MonoBehaviour
         return this.current_trial;
     }
 
+    private int getDollarBonus(double percent) {
+        // 0-20% of all possible rewards: $0
+        // 21-40% of all possible rewards: $1
+        // 41-60% of all possible rewards: $2
+        // 61-80% of all possible rewards: $3
+        // 81-100% of all possible rewards: $5
+        if (percet <= 0.2f) return 0;
+        else if (percent <= 0.4f) return 1;
+        else if (percent <= 0.6f) return 2;
+        else if (percent <= 0.8f) return 3;
+        else return 5;
+    }
+
     void Finish() {
         Debug.Log("Done, saving...");
         session.data.ts_session_end = Util.timestamp();
@@ -345,12 +358,17 @@ public class ExperimentRunner : MonoBehaviour
         string results = "All trials finished!\n\n";
         int total_points_possible = this.session.data.getPointsPossible();
         double percent = this.session.data.total_points / (double) total_points_possible;
-        results += string.Format("Final score is {0} points of of {1} points possible.\nYour final success rate is {2:0.0}%.\n\nYour experimenter will help you take off the VR headset.",
+        int bonusDollars = this.getDollarBonus(percent);
+        results += string.Format("Final score is {0} points of of {1} points possible.\n" +
+            "Your final success rate is {2:0.0}%. Bonus amount: ${3}\n\n" +
+            "Your experimenter will help you take off the VR headset.",
             this.session.data.total_points,
             total_points_possible,
-            100.0 * percent
+            100.0 * percent,
+            bonusDollars
         );
         ui.ShowHUDScreen(results, DGREEN);
+        Debug.Log(string.Format(">>> BONUS: $20 + ${0}", bonusDollars));
         TobiiXR.Stop();
     }
 }
