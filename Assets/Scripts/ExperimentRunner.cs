@@ -108,10 +108,12 @@ public class ExperimentRunner : MonoBehaviour
                 if (eyeTrackingData.GazeRay.IsValid) {
                     gazeOrigin = eyeTrackingData.GazeRay.Origin;
                     gazeDirection = eyeTrackingData.GazeRay.Direction;
-                    Ray ray = new Ray(gazeOrigin, gazeDirection);
-                    float dist = 0.0f;
-                    this.gazeCapturePlane.Raycast(ray, out dist);
-                    gazeTarget = ray.GetPoint(dist);
+                    if (this.topDownMode()) {
+                        Ray ray = new Ray(gazeOrigin, gazeDirection);
+                        float dist = 0.0f;
+                        this.gazeCapturePlane.Raycast(ray, out dist);
+                        gazeTarget = ray.GetPoint(dist);
+                    }
                 }
                 eitherEyeClosed = eyeTrackingData.IsLeftEyeBlinking || eyeTrackingData.IsRightEyeBlinking;
                 if (eyeTrackingData.ConvergenceDistanceIsValid) {
@@ -175,6 +177,10 @@ public class ExperimentRunner : MonoBehaviour
         return this.mode[0].ToString();
     }
 
+    public bool topDownMode() {
+        return this.isPlanning() || this.isTransitioning();
+    }
+    
     public bool isNavigating() {
         return this.mode == "navigation";
     }
