@@ -60,6 +60,7 @@ public class ExperimentRunner : MonoBehaviour
     public UIBehavior ui;
     public GameObject goMap;
     public AudioSource chimeAudio;
+    private Plane gazeCapturePlane; 
 
     // public SteamVR_LaserPointer laserPointer;
 
@@ -85,6 +86,7 @@ public class ExperimentRunner : MonoBehaviour
         this.chimeAudio = GetComponent<AudioSource>();
         this.mapBehavior = this.goMap.GetComponent<MapBehavior>();
         this.maps = new List<MapDef>();
+        this.gazeCapturePlane = new Plane(Vector3.up, new Vector3(0, 0, 0));
         // TobiiXR_Settings tobii_settings = new TobiiXR_Settings();
         // tobii_settings.FieldOfUse = FieldOfUse.Analytical;
         // TobiiXR.Start(tobii_settings); Performed by TobiiXR_Initializer?
@@ -99,12 +101,17 @@ public class ExperimentRunner : MonoBehaviour
             if (ts > ts_next_record) {
                 Vector3 gazeOrigin = new Vector3();
                 Vector3 gazeDirection = new Vector3();
+                Vector3 gazeTarget = new Vector3();
                 float convDistance = -1.0f; // Default when not valid
                 bool eitherEyeClosed = false;
                 var eyeTrackingData = TobiiXR.GetEyeTrackingData(TobiiXR_TrackingSpace.World);
                 if (eyeTrackingData.GazeRay.IsValid) {
                     gazeOrigin = eyeTrackingData.GazeRay.Origin;
                     gazeDirection = eyeTrackingData.GazeRay.Direction;
+                    Ray ray = new Ray(gazeOrigin, gazeDirection);
+                    float dist = 0.0f;
+                    this.gazeCapturePlane.Raycast(ray, out dist);
+                    gazeTarget = ray.GetPoint(dist);
                 }
                 eitherEyeClosed = eyeTrackingData.IsLeftEyeBlinking || eyeTrackingData.IsRightEyeBlinking;
                 if (eyeTrackingData.ConvergenceDistanceIsValid) {
@@ -117,6 +124,7 @@ public class ExperimentRunner : MonoBehaviour
                     controller,
                     gazeOrigin,
                     gazeDirection,
+                    gazeTarget,
                     convDistance,
                     eitherEyeClosed);
                 this.current_trial.addRecord(record);
