@@ -20,7 +20,6 @@ public class ExperimentRunner : MonoBehaviour
 
     public SessionSaver session;
     public bool QUICK_DEBUG = true;
-    public int N_TRIALS = 10; // Set to 0 for production. Just for short debug data collection
     public int N_MAPS = 20;
     public int N_MANUAL_MAPS = 3;
     public int practice_rounds = 2;
@@ -47,6 +46,7 @@ public class ExperimentRunner : MonoBehaviour
     // Main experiment objects
 
     private Transform trCameraRig;
+    private Transform trCamera;
     public Transform trAgent;
     private Transform controller;
     public Transform trSceneLight;
@@ -70,7 +70,6 @@ public class ExperimentRunner : MonoBehaviour
         this.goMap = GameObject.Find("Map");
         if (QUICK_DEBUG) {
             practice_rounds = 0;
-            N_TRIALS = 5;
             this.session_id = "DEBUG";
         } else {
             this.session_id = ((int)Util.timestamp()).ToString();
@@ -82,6 +81,7 @@ public class ExperimentRunner : MonoBehaviour
         this.sceneCamera = GameObject.Find("Camera").GetComponent<Camera>();
         this.ui = GameObject.Find("UICanvas").GetComponent<UIBehavior>();
         this.trCameraRig = GameObject.Find("[CameraRig]").GetComponent<Transform>();
+        this.trCamera = GameObject.Find("Camera").GetComponent<Transform>();
         this.controller = GameObject.FindGameObjectWithTag("Controller").GetComponent<Transform>();
         this.chimeAudio = GetComponent<AudioSource>();
         this.mapBehavior = this.goMap.GetComponent<MapBehavior>();
@@ -101,20 +101,20 @@ public class ExperimentRunner : MonoBehaviour
             if (ts > ts_next_record) {
                 Vector3 gazeOrigin = new Vector3();
                 Vector3 gazeDirection = new Vector3();
-                Vector3 gazeTarget = new Vector3();
+                // Vector3 gazeTarget = new Vector3();
                 float convDistance = -1.0f; // Default when not valid
                 bool eitherEyeClosed = false;
                 var eyeTrackingData = TobiiXR.GetEyeTrackingData(TobiiXR_TrackingSpace.World);
-                if (eyeTrackingData.GazeRay.IsValid) {
-                    gazeOrigin = eyeTrackingData.GazeRay.Origin;
-                    gazeDirection = eyeTrackingData.GazeRay.Direction;
-                    if (this.topDownMode()) {
-                        Ray ray = new Ray(gazeOrigin, gazeDirection);
-                        float dist = 0.0f;
-                        this.gazeCapturePlane.Raycast(ray, out dist);
-                        gazeTarget = ray.GetPoint(dist);
-                    }
-                }
+                // if (eyeTrackingData.GazeRay.IsValid) {
+                //     gazeOrigin = eyeTrackingData.GazeRay.Origin;
+                //     gazeDirection = eyeTrackingData.GazeRay.Direction;
+                //     if (this.topDownMode()) {
+                //         Ray ray = new Ray(gazeOrigin, gazeDirection);
+                //         float dist = 0.0f;
+                //         this.gazeCapturePlane.Raycast(ray, out dist);
+                //         gazeTarget = ray.GetPoint(dist);
+                //     }
+                // }
                 eitherEyeClosed = eyeTrackingData.IsLeftEyeBlinking || eyeTrackingData.IsRightEyeBlinking;
                 if (eyeTrackingData.ConvergenceDistanceIsValid) {
                     convDistance = eyeTrackingData.ConvergenceDistance;
@@ -122,15 +122,15 @@ public class ExperimentRunner : MonoBehaviour
                 Record record = new Record(
                     this.modeChar(),  // First letter of mode in [p, t, n]
                     this.trAgent,
-                    trCameraRig,
+                    trCamera,
                     controller,
                     gazeOrigin,
                     gazeDirection,
-                    gazeTarget,
+                    // gazeTarget,
                     convDistance,
                     eitherEyeClosed);
                 this.current_trial.addRecord(record);
-                ts_next_record = ts + 0.1;  // 10hz?
+                ts_next_record = ts + 0.15; 
             }
         }
         if (ts > ts_next_chime_check) {
@@ -151,8 +151,6 @@ public class ExperimentRunner : MonoBehaviour
             seconds_from_end = (int)(this.planningSeconds - (ts - trial.ts_planning_start));
             chimes_needed += this.N_CHIMES - seconds_from_end;
         } else if (this.isTransitioning()) {
-            // seconds_from_end = (int)(this.transitionSeconds - (ts - trial.ts_transition_start));
-            // chimes_needed += 2*this.N_CHIMES - seconds_from_end;
         } else if (this.isNavigating()) {
             seconds_from_end = (int)(Constants.NAVIGATION_SECONDS - (ts - trial.ts_navigation_start));
             chimes_needed += 2*this.N_CHIMES - seconds_from_end;
@@ -180,7 +178,7 @@ public class ExperimentRunner : MonoBehaviour
     public bool topDownMode() {
         return this.isPlanning() || this.isTransitioning();
     }
-    
+
     public bool isNavigating() {
         return this.mode == "navigation";
     }
@@ -217,7 +215,8 @@ public class ExperimentRunner : MonoBehaviour
 
     public void GotoNextTrial() {
         this.trial_index += 1;
-        if ((N_TRIALS != 0 && this.trial_index > N_TRIALS) || this.trial_index > this.N_TRIALS + this.practice_rounds) Finish();
+        int total_trials = this.map_order.Count;
+        if (this.trial_index > total_trials) Finish();
         else {
             RunOneTrial();
         }
@@ -356,7 +355,7 @@ public class ExperimentRunner : MonoBehaviour
         // 41-60% of all possible rewards: $2
         // 61-80% of all possible rewards: $3
         // 81-100% of all possible rewards: $5
-        if (percet <= 0.2f) return 0;
+        if (percent <= 0.2f) return 0;
         else if (percent <= 0.4f) return 1;
         else if (percent <= 0.6f) return 2;
         else if (percent <= 0.8f) return 3;
@@ -374,12 +373,12 @@ public class ExperimentRunner : MonoBehaviour
         double percent = this.session.data.total_points / (double) total_points_possible;
         int bonusDollars = this.getDollarBonus(percent);
         results += string.Format("Final score is {0} points of of {1} points possible.\n" +
-            "Your final success rate is {2:0.0}%. Bonus amount: ${3}\n\n" +
+            "Your final success rate is {2:0.0}%.\nTotal compensation: ${3}\n\n" +
             "Your experimenter will help you take off the VR headset.",
             this.session.data.total_points,
             total_points_possible,
             100.0 * percent,
-            bonusDollars
+            bonusDollars + 20
         );
         ui.ShowHUDScreen(results, DGREEN);
         Debug.Log(string.Format(">>> BONUS: $20 + ${0}", bonusDollars));

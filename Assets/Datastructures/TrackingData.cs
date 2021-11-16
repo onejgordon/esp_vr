@@ -57,7 +57,7 @@ public class Record {
 
 
     public Record(string mode, Transform trAgent, Transform trHMD, Transform trController, Vector3 gaze_origin, 
-            Vector3 gaze_direction, Vector3 gaze_target, float convDistance, bool blinking) {
+            Vector3 gaze_direction, float convDistance, bool blinking) {
         this.ts = Util.timestamp();
         Vector3 hmd_pos = trHMD.position;
         Vector3 ctr_pos = trController.position;
@@ -95,11 +95,11 @@ public class Record {
             this.gaze_dir_z = gaze_direction.z;
         }
         this.gaze_conv_dist = convDistance;
-        if (gaze_target != null) {
-            this.gaze_tgt_x = gaze_target.x;
-            this.gaze_tgt_y = gaze_target.y;
-            this.gaze_tgt_z = gaze_target.z;
-        }
+        // if (gaze_target != null) {
+        //     this.gaze_tgt_x = gaze_target.x;
+        //     this.gaze_tgt_y = gaze_target.y;
+        //     this.gaze_tgt_z = gaze_target.z;
+        // }
         this.blinking = blinking;
     }
 }
