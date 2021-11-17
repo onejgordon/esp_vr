@@ -87,9 +87,6 @@ public class ExperimentRunner : MonoBehaviour
         this.mapBehavior = this.goMap.GetComponent<MapBehavior>();
         this.maps = new List<MapDef>();
         this.gazeCapturePlane = new Plane(Vector3.up, new Vector3(0, 0, 0));
-        // TobiiXR_Settings tobii_settings = new TobiiXR_Settings();
-        // tobii_settings.FieldOfUse = FieldOfUse.Analytical;
-        // TobiiXR.Start(tobii_settings); Performed by TobiiXR_Initializer?
         this.BeginExperiment();
     }
 
@@ -150,10 +147,9 @@ public class ExperimentRunner : MonoBehaviour
         if (this.isPlanning()) {
             seconds_from_end = (int)(this.planningSeconds - (ts - trial.ts_planning_start));
             chimes_needed += this.N_CHIMES - seconds_from_end;
-        } else if (this.isTransitioning()) {
         } else if (this.isNavigating()) {
             seconds_from_end = (int)(Constants.NAVIGATION_SECONDS - (ts - trial.ts_navigation_start));
-            chimes_needed += 2*this.N_CHIMES - seconds_from_end;
+            chimes_needed += this.N_CHIMES - seconds_from_end;
         }
         return chimes_needed;
     }
@@ -265,6 +261,7 @@ public class ExperimentRunner : MonoBehaviour
     void StartPlanningPhase() {
         // Debug.Log("Start planning...");
         this.mode = "planning";
+        this.chimesPlayed = 0;
         this.SetMapVisibility(true);
         this.trAgent.gameObject.SetActive(true);
         this.mapBehavior.setupCameraForPlanning(this.trCameraRig);
@@ -306,7 +303,8 @@ public class ExperimentRunner : MonoBehaviour
 
     void StartNavigationPhase() {
         // Debug.Log("Start navigation...");
-        this.mode = "navigation";        
+        this.mode = "navigation";     
+        this.chimesPlayed = 0;   
         this.mapBehavior.setupAgentForNavigation(this.trAgent);
         this.mapBehavior.setupCameraForNavigation();
         this.SetMapVisibility(true);
