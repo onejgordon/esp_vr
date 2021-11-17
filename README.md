@@ -13,6 +13,8 @@ Tested with:
 
 ## Issues
 
+Make sure to run SRanipal SDK as administrator!
+
 1. NoseDirectionProvider used and not Tobii/Vive
 
 * SRanipal SDK running?
