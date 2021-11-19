@@ -11,7 +11,7 @@ public class ExperimentRunner : MonoBehaviour
     // Configs / params
     private Color SKY_DEFAULT = new Color(.8f, .8f, .8f);
     private Color DBLUE = new Color(.1f, .1f, 1f);
-    private Color WHITE = new Color(0.8f, 0.8f, 0.8f);
+    private Color DGRAY = new Color(0.3f, 0.3f, 0.3f);
     public int N_CHIMES = 3;
     private Color DGREEN = new Color(.1f, .6f, .1f);
     private Material goalMat = null;
@@ -240,7 +240,7 @@ public class ExperimentRunner : MonoBehaviour
         if (this.practicing) {
             ui.ShowHUDScreenWithConfirm(
                 string.Format(
-                    "This is practice round {0} of {1}. Your performance on these rounds won't affect your score. Click your controller trigger to proceed.",
+                    "This is practice round {0} of {1}.\nYour performance on these rounds won't affect your score.\nClick your controller trigger to proceed.",
                     this.practice_rounds - this.practice_remaining,
                     this.practice_rounds
                 ),
@@ -248,12 +248,12 @@ public class ExperimentRunner : MonoBehaviour
         } else {
             if (first_real) {
                 // Show message indicating we're starting real trials
-                ui.ShowHUDScreenWithConfirm("Great job. Practice rounds finished. All remaining trials are real and will be scored. Click your controller trigger to proceed.",
+                ui.ShowHUDScreenWithConfirm("Great job. Practice rounds finished.\nAll remaining trials are real and will be scored. Click your controller trigger to proceed.",
                 DBLUE, "BeginTrial");
             } else if (this.trial_index == OPTIONAL_PAUSE_AFTER) {
                 // Optional pause slide, require click to continue
-                ui.ShowHUDScreenWithConfirm("This is the optional break. Please tell your experimenter if you'd like to\ntake the headset off for a few minutes before continuing.\nClick the controller when ready to continue.",
-                WHITE, "BeginTrial");
+                ui.ShowHUDScreenWithConfirm("This is the optional break.\nPlease tell your experimenter if you'd like to\ntake the headset off for a few minutes before continuing.\nClick the controller when ready to continue.",
+                DGRAY, "BeginTrial");
             } else {
                 BeginTrial();
             }
