@@ -11,6 +11,7 @@ public class ExperimentRunner : MonoBehaviour
     // Configs / params
     private Color SKY_DEFAULT = new Color(.8f, .8f, .8f);
     private Color DBLUE = new Color(.1f, .1f, 1f);
+    private Color WHITE = new Color(0.8f, 0.8f, 0.8f);
     public int N_CHIMES = 3;
     private Color DGREEN = new Color(.1f, .6f, .1f);
     private Material goalMat = null;
@@ -21,6 +22,7 @@ public class ExperimentRunner : MonoBehaviour
     public SessionSaver session;
     public bool QUICK_DEBUG = true;
     public int N_MAPS = 20;
+    public int OPTIONAL_PAUSE_AFTER = 18;
     public int N_MANUAL_MAPS = 3;
     public int practice_rounds = 2;
     public bool left_handed = false;
@@ -248,6 +250,10 @@ public class ExperimentRunner : MonoBehaviour
                 // Show message indicating we're starting real trials
                 ui.ShowHUDScreenWithConfirm("Great job. Practice rounds finished. All remaining trials are real and will be scored. Click your controller trigger to proceed.",
                 DBLUE, "BeginTrial");
+            } else if (this.trial_index == OPTIONAL_PAUSE_AFTER) {
+                // Optional pause slide, require click to continue
+                ui.ShowHUDScreenWithConfirm("This is the optional break. Please tell your experimenter if you'd like to\ntake the headset off for a few minutes before continuing.\nClick the controller when ready to continue.",
+                WHITE, "BeginTrial");
             } else {
                 BeginTrial();
             }
