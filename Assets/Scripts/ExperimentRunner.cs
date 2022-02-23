@@ -104,16 +104,16 @@ public class ExperimentRunner : MonoBehaviour
                 float convDistance = -1.0f; // Default when not valid
                 bool eitherEyeClosed = false;
                 var eyeTrackingData = TobiiXR.GetEyeTrackingData(TobiiXR_TrackingSpace.World);
-                // if (eyeTrackingData.GazeRay.IsValid) {
-                //     gazeOrigin = eyeTrackingData.GazeRay.Origin;
-                //     gazeDirection = eyeTrackingData.GazeRay.Direction;
-                //     if (this.topDownMode()) {
-                //         Ray ray = new Ray(gazeOrigin, gazeDirection);
-                //         float dist = 0.0f;
-                //         this.gazeCapturePlane.Raycast(ray, out dist);
-                //         gazeTarget = ray.GetPoint(dist);
-                //     }
-                // }
+                if (eyeTrackingData.GazeRay.IsValid) {
+                    gazeOrigin = eyeTrackingData.GazeRay.Origin;
+                    gazeDirection = eyeTrackingData.GazeRay.Direction;
+                    if (this.topDownMode()) {
+                        Ray ray = new Ray(gazeOrigin, gazeDirection);
+                        float dist = 0.0f;
+                        this.gazeCapturePlane.Raycast(ray, out dist);
+                        gazeTarget = ray.GetPoint(dist);
+                    }
+                }
                 eitherEyeClosed = eyeTrackingData.IsLeftEyeBlinking || eyeTrackingData.IsRightEyeBlinking;
                 if (eyeTrackingData.ConvergenceDistanceIsValid) {
                     convDistance = eyeTrackingData.ConvergenceDistance;
